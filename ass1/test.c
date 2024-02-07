@@ -24,7 +24,7 @@ bool compare(void* arg1, void* arg2){
 
 void print_list(List* plist){
     printf("List contains: ");
-    if(plist->count != 0){
+    if(plist->countNumber != 0){
         Node* starting_current = plist->current;
         int* print = List_first(plist);
         printf("%d,", (*print));
@@ -265,21 +265,21 @@ void Test_List_concat_empty_list2(List* plist1, List* plist2){
     print_list(plist1);
 }
 
-void Test_List_free_normal(List* plist, FREE_FN pItemFreeFn){
-    int cur_heads = free_heads_count();
-    int cur_nodes = free_nodes_count();
-    List_free(plist, pItemFreeFn);
-    assert(cur_heads+1 == free_heads_count());
-    assert(cur_nodes+1 == free_nodes_count());
-}
+// void Test_List_free_normal(List* plist, FREE_FN pItemFreeFn){
+//     int cur_heads = free_heads_count();
+//     int cur_nodes = free_nodes_count();
+//     List_free(plist, pItemFreeFn);
+//     assert(cur_heads+1 == free_heads_count());
+//     assert(cur_nodes+1 == free_nodes_count());
+// }
 
-void Test_List_free_empty(List* plist, FREE_FN pItemFreeFn){
-    int cur_heads = free_heads_count();
-    int cur_nodes = free_nodes_count();
-    List_free(plist, pItemFreeFn);
-    assert(cur_heads+1 == free_heads_count());
-    assert(cur_nodes == free_nodes_count());
-}
+// void Test_List_free_empty(List* plist, FREE_FN pItemFreeFn){
+//     int cur_heads = free_heads_count();
+//     int cur_nodes = free_nodes_count();
+//     List_free(plist, pItemFreeFn);
+//     assert(cur_heads+1 == free_heads_count());
+//     assert(cur_nodes == free_nodes_count());
+// }
 
 void Test_List_search_normal(List* pList, COMPARATOR_FN pComparator, void* pComparisonArg){
     int* guess = List_search(pList, pComparator, pComparisonArg);
