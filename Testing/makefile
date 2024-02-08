@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS = -Wall -g -I/300/ass1
-LDFLAGS = run -pthread
+CFLAGS = -Wall -g
+LDFLAGS = -lpthread
 PROG = program
 HDRS = 
 SRCS = main.c
@@ -10,7 +10,7 @@ OBJS = $(SRCS:.c=.o)
 ## This is the first rule (the default)
 ## Build the program from the three .o's
 $(PROG) : $(OBJS)
-	$(CC) $(LDFLAGS) $(OBJS) -o $(PROG)
+	$(CC) $(CFLAGS) $(OBJS) -o $(PROG) $(LDFLAGS)
 ## Rules for the source files -- these do not have
 ## second build rule lines, so they will use the
 ## default build rule to compile X.c to make X.o
