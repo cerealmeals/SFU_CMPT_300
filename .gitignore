@@ -1,0 +1,5 @@
+#vscode ignores
+.vscode
+
+#don't save the .o files
+*.o
