@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -g
 LDFLAGS = -lpthread
 PROG = program
-HDRS = 
+HDRS = list.h
 SRCS = main.c
 ## This incantation says that the object files
 ## have the same name as the .c files, but with .o
@@ -14,8 +14,8 @@ $(PROG) : $(OBJS)
 ## Rules for the source files -- these do not have
 ## second build rule lines, so they will use the
 ## default build rule to compile X.c to make X.o
-main.o : main.c
-# list.o : list.h
+main.o : main.c list.h
+list.o : list.h
 # test.o : test.h
 ## Remove all the compilation and debugging files
 clean :
