@@ -1,6 +1,7 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "list.h"
 
 void *print_message_function( void *ptr ){
     char *message;
@@ -11,8 +12,9 @@ void *print_message_function( void *ptr ){
 }
 
 void *get_user_input(){
-    char *input;
-    while(input != "!"){
+    char input[80];
+    input[0] = ' ';
+    while(input[0] != '!'){
         scanf("%s", input);
         printf("%s\n", input);
     }
