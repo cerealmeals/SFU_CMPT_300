@@ -10,11 +10,11 @@ void *print_message_function( void *ptr ){
     }
 }
 
-void *get user_input(){
-    char *input
+void *get_user_input(){
+    char *input;
     while(input != "!"){
-        scanf("%s", input)
-        printf("%s\n", input)
+        scanf("%s", input);
+        printf("%s\n", input);
     }
 }
 
@@ -24,7 +24,7 @@ int main() {
     char *message2 = "Thread 2";
     int iret1, iret2;
     /* Create independent threads each of which will execute function */
-    iret1 = pthread_create( &thread1, NULL, user_input, NULL);
+    iret1 = pthread_create( &thread1, NULL, get_user_input, NULL);
     // iret2 = pthread_create( &thread2, NULL, print_message_function, (void*) message2);
     /* Wait till threads are complete before main continues. Unless we */
     /* wait we run the risk of executing an exit which will terminate */
