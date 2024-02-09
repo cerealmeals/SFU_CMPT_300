@@ -3,7 +3,7 @@ CFLAGS = -Wall -g
 LDFLAGS = -lpthread
 PROG = program
 HDRS = list.h
-SRCS = main.c
+SRCS = main.c list.c
 ## This incantation says that the object files
 ## have the same name as the .c files, but with .o
 OBJS = $(SRCS:.c=.o)
