@@ -74,6 +74,7 @@ void *get_user_input(){
 
 int main() {
     keyboard_list = List_create();
+    receiving_list =List_create();
     pthread_mutex_init(&mutex, NULL);
     pthread_cond_init(&condition_empty, NULL);
     pthread_cond_init(&condition_full, NULL);
@@ -99,6 +100,7 @@ int main() {
 
     FREE_FN free_er = free_char;
     List_free(keyboard_list, free_er);
+    List_free(receiving_list, free_er);
     exit(0);
     return 0;
 }
