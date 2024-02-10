@@ -19,27 +19,40 @@ void free_char(void* pItem) {
 }
 
 void *print_to_screen(){
-    
-    char *message = "what?";
-    while(message[0] != '!'){
-
+    char ch;
+    int i;
+    do{
+        
         pthread_mutex_lock(&mutex);
         if(List_count(keyboard_list)==0){
             pthread_cond_wait(&condition_empty, &mutex);
         }
-        message = List_trim(keyboard_list);
+        char * message = List_trim(keyboard_list);
         pthread_cond_signal(&condition_full);
         pthread_mutex_unlock(&mutex);
+        
+        i = strlen(message);
+        ch = message[0];
 
-        printf("%s", message);
+        if((ch != '!')||(i!=2)){
+
+            for(int j = 0; j < strlen(message); j++){
+                putchar(message[j]);
+                fflush(stdout);
+                sleep_sec2(100);
+            }
+        }
+
+        
         free(message);
-    }
+        
+    }while((ch != '!')||(i!=2));
 }
 
 void *get_user_input(){
-    char *input = malloc(MAX_BUFFER);
-    *input = ' ';
-    while(input[0] != '!'){
+    char * input;
+    do{
+        input = (char*) malloc(MAX_BUFFER);
         fgets(input, MAX_BUFFER, stdin);
         // input[MAX_BUFFER - 1] = '\0';
         // printf("%ld", sizeof(input));
@@ -56,11 +69,12 @@ void *get_user_input(){
         // *input = getchar();
         // printf("%c", *input);
         //printf("\n");
-    }
+    }while((input[0] != '!')||(strlen(input)!=2));
 }
 
 int main() {
     keyboard_list = List_create();
+    receiving_list =List_create();
     pthread_mutex_init(&mutex, NULL);
     pthread_cond_init(&condition_empty, NULL);
     pthread_cond_init(&condition_full, NULL);
@@ -86,6 +100,7 @@ int main() {
 
     FREE_FN free_er = free_char;
     List_free(keyboard_list, free_er);
+    List_free(receiving_list, free_er);
     exit(0);
     return 0;
 }
