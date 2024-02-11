@@ -1,5 +1,7 @@
-#include "receiver.h"
+/* Create a thread for receiving messages from the sender, and put it onto the input list */
+
 #include "list.h"
+#include "receiver.h"
 #include <pthread.h>
 #include <string.h>
 #include <stdio.h>
@@ -8,44 +10,40 @@
 static pthread_t thread3;
 static char* dynamicArray;
 static unsigned int MAX_LENGTH = 100;
-pthread_mutex_t mutex;
+static pthread_mutex_t receive_mutex = PTHREAD_MUTEX_INITIALIZER;;
 List* receive_list;
 
-// delete when all threads combine together
-void free_char2(void* pItem) {
-  // cast pItem to a char pointer
-  char* i = (char*) pItem;
-  // free the memory allocated for the string
-  free(i);
+// free message
+void free_item(void* pItem) 
+{
+  if (pItem)
+    free(pItem);
 }
 
 void* receiveThread()
 {
-    /*** socket thing to get the message in, don't do for now ***/
-    receive_list = List_create(); // change when list shared
-    if (receive_list == NULL) {
-        printf("Error: receive_list is not initialized\n");
-        return;
-    }
+    // printf("22\n");
+    dynamicArray = (char*)malloc(MAX_LENGTH * sizeof(char));   
+     
+    /*** TODO: socket thing to get the message in ***/
+    char message[12] = "Hello world";
+    strcpy(dynamicArray, message); // copy message from the soket later
 
-    printf("18\n");
-    dynamicArray = (char*)malloc(MAX_LENGTH * sizeof(char));
-
-    printf("20\n");
-    pthread_mutex_lock(&mutex);
+    pthread_mutex_lock(&receive_mutex);
     // TODO: condition variables....
-    strcpy(dynamicArray, "hello world"); // copy message from the soket later
     List_prepend(receive_list, (void*)dynamicArray);
-    pthread_mutex_unlock(&mutex);
-
+    // printf("%s\n",dynamicArray);
+    pthread_mutex_unlock(&receive_mutex);
+    
+    return NULL;
 }
 
-void receiveThread_create()
+// create receive thread, pass the input list
+void receiveThread_create(List* pList)
 {
+    receive_list = pList;
     pthread_create(&thread3, NULL, receiveThread, NULL);
 }
-
-
 
 void receiveThread_close()
 {
@@ -56,16 +54,10 @@ void receiveThread_close()
     pthread_join(thread3, NULL);
 
     // free memory
-    pthread_mutex_lock(&mutex);
+    pthread_mutex_lock(&receive_mutex);
     { 
-        FREE_FN free_er = free_char2;
-        List_free(receive_list, free_er);
+        List_free(receive_list, free_item);
     }
-    pthread_mutex_unlock(&mutex);
+    pthread_mutex_unlock(&receive_mutex);
    
-}
-
-void screenOutput_thread()
-{
-    
 }

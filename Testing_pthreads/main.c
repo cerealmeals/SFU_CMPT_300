@@ -3,9 +3,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include "list.h"
+#include "receiver.h"
+#include "sender.h"
 
 #define MAX_BUFFER 256
 List* keyboard_list;
+List* receiving_list;
 pthread_mutex_t mutex;
 pthread_cond_t condition_empty;
 pthread_cond_t condition_full;
@@ -72,6 +75,40 @@ void *get_user_input(){
     }while((input[0] != '!')||(strlen(input)!=2));
 }
 
+void katieTesting_function()
+{
+    /***************katie's test******************/
+    /*Testing sender*/
+    keyboard_list = List_create();
+    pthread_mutex_init(&mutex, NULL);
+    pthread_cond_init(&condition_empty, NULL);
+    pthread_cond_init(&condition_full, NULL);
+    pthread_t thread1;
+    
+    pthread_create( &thread1, NULL, get_user_input, NULL);
+    senderThread_create(keyboard_list);
+
+    pthread_join(thread1, NULL);
+    senderThread_close();
+
+    FREE_FN free_er = free_char;
+    List_free(keyboard_list, free_er);
+    /*End testing*/
+
+
+
+    /*Testing receiver*/ 
+    List* receiveMessage_list = List_create();
+    // pass the input list
+    receiveThread_create(receiveMessage_list);
+
+    receiveThread_close();
+    
+    /*end testng*/
+
+    /***************end test******************/
+}
+
 int main() {
     keyboard_list = List_create();
     receiving_list =List_create();
@@ -103,4 +140,6 @@ int main() {
     List_free(receiving_list, free_er);
     exit(0);
     return 0;
+    // katieTesting_function();
 }
+

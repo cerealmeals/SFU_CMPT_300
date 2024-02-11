@@ -2,8 +2,8 @@ CC = gcc
 CFLAGS = -Wall -g
 LDFLAGS = -lpthread
 PROG = program
-HDRS = list.h sleep.h
-SRCS = main.c list.c sleep.c
+HDRS = list.h sleep.h receiver.h sender.h
+SRCS = main.c list.c sleep.c receiver.c sender.c
 ## This incantation says that the object files
 ## have the same name as the .c files, but with .o
 OBJS = $(SRCS:.c=.o)
