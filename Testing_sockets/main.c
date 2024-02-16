@@ -9,7 +9,8 @@
 #define port 12345
 #define MAX_LENGTH 1024
 
-int main(int argc, char *argv[]){
+int main(int argc, char *argv[])
+{
     // initialize
     struct sockaddr_in addr;
     addr.sin_family = AF_INET;
@@ -32,6 +33,10 @@ int main(int argc, char *argv[]){
         // Return the number of bytes
         unsigned int i =  sizeof(struct sockaddr_in);
         int receivedBytes = recvfrom(s, &messageRx, MAX_LENGTH, 0, (struct sockaddr *)&addrRomote, &i);
+        if (receivedBytes==-1)
+        {
+            ferror("error! \n");
+        }
 
         // make it terminated
         // messageRx[receivedBytes] = '\0';
@@ -46,14 +51,14 @@ int main(int argc, char *argv[]){
         }
         messageRx[terminated] = 0;
 
-        printf("Received message is %d bytes: %s \n", receivedBytes, messageRx);
+        printf("Received message is %d bytes: %s", receivedBytes, messageRx);
 
         // send messages
         char messageSend[MAX_LENGTH];
-        sendto(s, &messageSend, MAX_LENGTH, 0, (struct sockaddr *)&addrRomote, sizeof(struct sockaddr_in));
-        printf("sending message is: %s \n", messageSend);
+        sendto(s, &messageSend, strlen(messageSend), 0, (struct sockaddr *)&addrRomote, sizeof(struct sockaddr_in));
+        printf("sending message is: %s", messageSend);
 
        
     }
-  close(s);
+    close(s);
 }
