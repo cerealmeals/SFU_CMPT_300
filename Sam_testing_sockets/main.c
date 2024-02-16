@@ -1,55 +1,79 @@
 #include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
+#include <string.h>
+#include <unistd.h> 
 
-int main(int argc, char *argv[])
-{
-    struct addrinfo hints, *res, *p;
-    int status;
-    char ipstr[INET6_ADDRSTRLEN];
+#define port 12345
+#define MAX_LENGTH 1024
 
-    if (argc != 3) {
-        fprintf(stderr,"usage: showip hostname\n");
-        return 1;
-    }
+int main(int argc, char *argv[]){
+    char *hostname;
+    size_t size = 264;
+
+    gethostname(hostname, size);
+
+    printf("%s\n", hostname);
+
+
+    struct addrinfo hints, *res;
+    int sockfd;
+
+    // first, load up address structs with getaddrinfo():
 
     memset(&hints, 0, sizeof hints);
-    hints.ai_family = AF_UNSPEC; // AF_INET or AF_INET6 to force version
-    hints.ai_socktype = SOCK_STREAM; // SOCK_DGRAM
+    hints.ai_family = AF_INET;  // use IPv4 or IPv6, whichever
+    hints.ai_socktype = SOCK_DGRAM;
+    hints.ai_flags = AI_PASSIVE;     // fill in my IP for me
 
-    if ((status = getaddrinfo(argv[2], argv[1], &hints, &res)) != 0) {
+    if ((status = getaddrinfo(NULL, hton(port), &hints, &res)) != 0) {
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(status));
         return 2;
     }
 
-    printf("IP addresses for %s:\n\n", argv[2]);
+    // make a socket:
 
-    for(p = res;p != NULL; p = p->ai_next) {
-        void *addr;
-        char *ipver;
+    sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 
-        // get the pointer to the address itself,
-        // different fields in IPv4 and IPv6:
-        if (p->ai_family == AF_INET) { // IPv4
-            struct sockaddr_in *ipv4 = (struct sockaddr_in *)p->ai_addr;
-            addr = &(ipv4->sin_addr);
-            ipver = "IPv4";
-        } else { // IPv6
-            struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)p->ai_addr;
-            addr = &(ipv6->sin6_addr);
-            ipver = "IPv6";
+    // bind the socket and the port
+    bind(sockfd, (struct sockaddr *) &addr, sizeof(struct sockaddr_in));
+    char messageRx[MAX_LENGTH];
+
+    do
+    {
+        struct sockaddr_in addrRomote;
+        
+
+        // receive messages
+        // Return the number of bytes
+        unsigned int i =  sizeof(struct sockaddr_in);
+        int receivedBytes = recvfrom(sockfd, &messageRx, MAX_LENGTH, 0, (struct sockaddr *)&addrRomote, &i);
+
+        // make it terminated
+        // messageRx[receivedBytes] = '\0';
+        int terminated;
+        if (receivedBytes<MAX_LENGTH)
+        {
+            terminated = receivedBytes;
         }
+        else
+        {
+            terminated = MAX_LENGTH-1;
+        }
+        messageRx[terminated] = 0;
 
-        // convert the IP to a string and print it:
-        inet_ntop(p->ai_family, addr, ipstr, sizeof ipstr);
-        printf("  %s: %s\n", ipver, ipstr);
-    }
+        printf("Received message is %d bytes: %s \n", receivedBytes, messageRx);
 
-    freeaddrinfo(res); // free the linked list
+        // send messages
+        char messageSend[MAX_LENGTH];
+        messageSend[0] = 'R';
+        messageSend[1] = '\0';
+        sendto(sockfd, &messageSend, strlen(messageSend), 0, (struct sockaddr *)&addrRomote, sizeof(struct sockaddr_in));
+        printf("sending message is: %s \n", messageSend);
 
-    return 0;
+       
+    }while(messageRx[0] != '!');
+  close(s);
 }
