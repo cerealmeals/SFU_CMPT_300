@@ -23,11 +23,12 @@ int main(int argc, char *argv[])
 
     // bind the socket and the port
     bind(s, (struct sockaddr *) &addr, sizeof(struct sockaddr_in));
+    char messageRx[MAX_LENGTH];
 
-    while (1)
+    do
     {
         struct sockaddr_in addrRomote;
-        char messageRx[MAX_LENGTH];
+        
 
         // receive messages
         // Return the number of bytes
@@ -56,9 +57,9 @@ int main(int argc, char *argv[])
         // send messages
         char messageSend[MAX_LENGTH];
         sendto(s, &messageSend, strlen(messageSend), 0, (struct sockaddr *)&addrRomote, sizeof(struct sockaddr_in));
-        printf("sending message is: %s", messageSend);
+        printf("sending message is: %s \n", messageSend);
 
        
     }
-    close(s);
+  close(s);
 }
