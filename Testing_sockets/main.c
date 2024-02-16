@@ -6,7 +6,7 @@
 #include <string.h>
 #include <unistd.h> 
 
-#define port 12345
+#define port 1234
 #define MAX_LENGTH 1024
 
 int main(int argc, char *argv[])
@@ -16,6 +16,7 @@ int main(int argc, char *argv[])
     addr.sin_family = AF_INET;
     addr.sin_port = htons(port);
     addr.sin_addr.s_addr = INADDR_ANY;
+    // printf("%d \n", addr.sin_addr.s_addr);
     memset(&addr.sin_zero, 0, sizeof(addr));
 
     // create a socket for UDP
@@ -23,12 +24,12 @@ int main(int argc, char *argv[])
 
     // bind the socket and the port
     bind(s, (struct sockaddr *) &addr, sizeof(struct sockaddr_in));
-    char messageRx[MAX_LENGTH];
+    //char messageRx[MAX_LENGTH];
 
     do
     {
         struct sockaddr_in addrRomote;
-        
+        char messageRx[MAX_LENGTH];
 
         // receive messages
         // Return the number of bytes
@@ -59,7 +60,6 @@ int main(int argc, char *argv[])
         sendto(s, &messageSend, strlen(messageSend), 0, (struct sockaddr *)&addrRomote, sizeof(struct sockaddr_in));
         printf("sending message is: %s \n", messageSend);
 
-       
-    }
-  close(s);
+    }while(1);
+    close(s);
 }
