@@ -1,3 +1,5 @@
+// https://www.educative.io/answers/how-to-implement-udp-sockets-in-c
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -14,7 +16,7 @@ int main(int argc, char *argv[]){
     size_t size = 100;
     gethostname(hostname, size);
     
-    printf("%s\n", hostname);
+    // printf("%s\n", hostname);
     struct addrinfo hints, *results;
     int sockme, sockyou, status;
 
@@ -34,9 +36,10 @@ int main(int argc, char *argv[]){
     // make a socket:
 
     sockme = socket(results->ai_family, results->ai_socktype, results->ai_protocol);
-
+    printf("sockme: %d\n", sockme);
     // bind the socket and the port
-    bind(sockme, results->ai_addr, results->ai_addrlen);
+    int check = bind(sockme, results->ai_addr, results->ai_addrlen);
+    printf("bild sockme: %d\n", check);
     
     freeaddrinfo(results); // free the linked list
     
@@ -44,11 +47,7 @@ int main(int argc, char *argv[]){
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(status));
         return 2;
     }
-    
 
-
-    sockyou = socket(results->ai_family, results->ai_socktype, results->ai_protocol);
-    
     struct sockaddr* addrRomote = (results->ai_addr);
 
     freeaddrinfo(results); // free the linked list
@@ -59,10 +58,12 @@ int main(int argc, char *argv[]){
         
         // receive messages
         // Return the number of bytes
-        unsigned int i =  sizeof(struct sockaddr_in);
+        unsigned int i_size =  sizeof(addrRomote);
         int receivedBytes = 0;
         if(k != 0){
-            receivedBytes = recvfrom(sockyou, &messageRx, strlen(messageRx), 0, addrRomote, &i);
+            printf("1000\n");
+            receivedBytes = recvfrom(sockme, &messageRx, strlen(messageRx), 0, addrRomote, &i_size);
+            printf("1001: %d\n", receivedBytes);
         }
         
         // make it terminated
@@ -83,11 +84,10 @@ int main(int argc, char *argv[]){
         char messageSend[16];
         printf("Type your message, less then 15 characters\n");
         scanf("%15s", &messageSend);
-        sendto(sockme, &messageSend, strlen(messageSend), 0, addrRomote, sizeof(struct sockaddr_in));
+        sendto(sockme, &messageSend, strlen(messageSend), 0, addrRomote, i_size);
         printf("sending message is: %s \n", messageSend);
 
        
     }
   close(sockme);
-  close(sockyou);
 }
