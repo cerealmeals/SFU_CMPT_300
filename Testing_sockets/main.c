@@ -34,16 +34,26 @@ int main(int argc, char *argv[]){
         int receivedBytes = recvfrom(s, &messageRx, MAX_LENGTH, 0, (struct sockaddr *)&addrRomote, &i);
 
         // make it terminated
-        messageRx[receivedBytes] = '\0';
+        // messageRx[receivedBytes] = '\0';
+        int terminated;
+        if (receivedBytes<MAX_LENGTH)
+        {
+            terminated = receivedBytes;
+        }
+        else
+        {
+            terminated = MAX_LENGTH-1;
+        }
+        messageRx[terminated] = 0;
 
         printf("Received message is %d bytes: %s \n", receivedBytes, messageRx);
 
         // send messages
         char messageSend[MAX_LENGTH];
         sendto(s, &messageSend, MAX_LENGTH, 0, (struct sockaddr *)&addrRomote, sizeof(struct sockaddr_in));
-        printf("sending message is bytes: %s \n", messageSend);
+        printf("sending message is: %s \n", messageSend);
 
-           close(s);
+       
     }
- 
+  close(s);
 }
