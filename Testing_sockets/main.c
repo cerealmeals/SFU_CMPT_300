@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <string.h>
+#include <unistd.h> 
 
 #define port 12345
 #define MAX_LENGTH 1024
@@ -29,8 +30,8 @@ int main(int argc, char *argv[]){
 
         // receive messages
         // Return the number of bytes
-        int receivedBytes = recvfrom(s, &messageRx, MAX_LENGTH, 0, (struct sockaddr *)&addrRomote,
-sizeof(struct sockaddr_in));
+        unsigned int i =  sizeof(struct sockaddr_in);
+        int receivedBytes = recvfrom(s, &messageRx, MAX_LENGTH, 0, (struct sockaddr *)&addrRomote, &i);
 
         // make it terminated
         messageRx[receivedBytes] = '\0';
@@ -39,9 +40,10 @@ sizeof(struct sockaddr_in));
 
         // send messages
         char messageSend[MAX_LENGTH];
-        sendto(s, &messageSend, MAX_LENGTH, 0, (struct sockaddr *)&addrRomote, sizeof(struct
-sockaddr_in));
+        sendto(s, &messageSend, MAX_LENGTH, 0, (struct sockaddr *)&addrRomote, sizeof(struct sockaddr_in));
+        printf("sending message is bytes: %s \n", messageSend);
 
-        close(s);
+           close(s);
     }
+ 
 }
