@@ -10,47 +10,61 @@
 #define MAX_LENGTH 1024
 
 int main(int argc, char *argv[]){
-    char *hostname;
-    size_t size = 264;
-
+    char hostname[100];
+    size_t size = 100;
     gethostname(hostname, size);
-
+    
     printf("%s\n", hostname);
+    struct addrinfo hints, *results;
+    int sockme, sockyou, status;
 
-
-    struct addrinfo hints, *res;
-    int sockfd;
-
-    // first, load up address structs with getaddrinfo():
+    // first, load up addresultss structs with getaddrinfo():
 
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_INET;  // use IPv4 or IPv6, whichever
     hints.ai_socktype = SOCK_DGRAM;
-    hints.ai_flags = AI_PASSIVE;     // fill in my IP for me
+    // hints.ai_flags = AI_PASSIVE;     // fill in my IP for me
 
-    if ((status = getaddrinfo(NULL, hton(port), &hints, &res)) != 0) {
+    if ((status = getaddrinfo(hostname, argv[1], &hints, &results)) != 0) {
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(status));
         return 2;
     }
 
+    
     // make a socket:
 
-    sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+    sockme = socket(results->ai_family, results->ai_socktype, results->ai_protocol);
 
     // bind the socket and the port
-    bind(sockfd, (struct sockaddr *) &addr, sizeof(struct sockaddr_in));
-    char messageRx[MAX_LENGTH];
+    bind(sockme, results->ai_addr, results->ai_addrlen);
+    
+    freeaddrinfo(results); // free the linked list
+    
+    if ((status = getaddrinfo(argv[2], argv[3], &hints, &results)) != 0) {
+        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(status));
+        return 2;
+    }
+    
 
-    do
+
+    sockyou = socket(results->ai_family, results->ai_socktype, results->ai_protocol);
+    
+    struct sockaddr* addrRomote = (results->ai_addr);
+
+    freeaddrinfo(results); // free the linked list
+    
+    char messageRx[] = "testing testing";
+    for(int k = 0; k < 5; k++)
     {
-        struct sockaddr_in addrRomote;
         
-
         // receive messages
         // Return the number of bytes
         unsigned int i =  sizeof(struct sockaddr_in);
-        int receivedBytes = recvfrom(sockfd, &messageRx, MAX_LENGTH, 0, (struct sockaddr *)&addrRomote, &i);
-
+        int receivedBytes = 0;
+        if(k != 0){
+            receivedBytes = recvfrom(sockyou, &messageRx, strlen(messageRx), 0, addrRomote, &i);
+        }
+        
         // make it terminated
         // messageRx[receivedBytes] = '\0';
         int terminated;
@@ -63,17 +77,17 @@ int main(int argc, char *argv[]){
             terminated = MAX_LENGTH-1;
         }
         messageRx[terminated] = 0;
-
         printf("Received message is %d bytes: %s \n", receivedBytes, messageRx);
 
         // send messages
-        char messageSend[MAX_LENGTH];
-        messageSend[0] = 'R';
-        messageSend[1] = '\0';
-        sendto(sockfd, &messageSend, strlen(messageSend), 0, (struct sockaddr *)&addrRomote, sizeof(struct sockaddr_in));
+        char messageSend[16];
+        printf("Type your message, less then 15 characters\n");
+        scanf("%15s", &messageSend);
+        sendto(sockme, &messageSend, strlen(messageSend), 0, addrRomote, sizeof(struct sockaddr_in));
         printf("sending message is: %s \n", messageSend);
 
        
-    }while(messageRx[0] != '!');
-  close(s);
+    }
+  close(sockme);
+  close(sockyou);
 }

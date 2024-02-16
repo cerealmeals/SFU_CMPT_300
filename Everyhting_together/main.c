@@ -89,6 +89,8 @@ int main() {
     //char *message1 = "Thread 1";
     //char *message2 = "Thread 2";
     int iret1, iret2, iret3, iret4;
+
+    
     /* Create independent threads each of which will execute function */
 
     // gets user input and but message in keyboard_list
