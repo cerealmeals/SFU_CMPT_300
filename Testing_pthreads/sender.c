@@ -6,29 +6,41 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <unistd.h> 
 static pthread_t thread4;
 static char* messageToBeSent;
 static pthread_mutex_t sender_mutex = PTHREAD_MUTEX_INITIALIZER;;
 List* sender_list;
 pthread_cond_t condition_empty1 = PTHREAD_COND_INITIALIZER;
+static bool flag = true;
+static int s;
 
 void* senderThread()
 {
-    while(1)
+    while(flag)
     {
         pthread_mutex_lock(&sender_mutex);
+    
         if (List_count(sender_list) > 0) 
         {
-            messageToBeSent = List_first(sender_list);
-
-            // if (strcmp(messageToBeSent, "!") == 0)
-            // {
-            //     pthread_cancel(thread4);
-            //     break;
-            // } 
+            messageToBeSent = (char*)List_first(sender_list);
+            if (*messageToBeSent == '!')
+            {
+                pthread_mutex_unlock(&sender_mutex);
+                printf("Sender thread received termination signal.\n");
+                flag = false;
+                break;
+            } 
 
             printf("Sending: %s", messageToBeSent);
+            
+            // socket stuff to send messages
+            // struct sockaddr_in addrRomote;
+            // sendto(s, &messageToBeSent, strlen(messageToBeSent), 0, (struct sockaddr *)&addrRomote, sizeof(struct sockaddr_in));
+            
             List_remove(sender_list);
             // pthread_cond_wait(&condition_empty1, &sender_mutex);
         }
