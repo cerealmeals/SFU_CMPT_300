@@ -6,7 +6,7 @@
 #include <string.h>
 #include <unistd.h> 
 
-#define port 1234
+#define port 12345
 #define MAX_LENGTH 1024
 
 int main(int argc, char *argv[])

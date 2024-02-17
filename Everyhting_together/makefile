@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -g
 LDFLAGS = -lpthread
-PROG = program
+PROG = s-talk
 HDRS = list.h sleep.h receiver.h sender.h
 SRCS = main.c list.c sleep.c receiver.c sender.c
 ## This incantation says that the object files
