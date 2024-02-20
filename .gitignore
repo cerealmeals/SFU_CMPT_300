@@ -4,3 +4,4 @@
 #don't save the .o files or the program
 *.o
 program
+s-talk

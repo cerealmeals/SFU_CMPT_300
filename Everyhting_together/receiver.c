@@ -37,7 +37,7 @@ void* receiveThread()
     dynamicArray = (char*)malloc(MAX_LENGTH * sizeof(char));   
      // create a socket for UDP
     socket = socket(AF_INET, SOCK_DGRAM, 0);
-
+    
     do
     {
         struct sockaddr_in addrRomote;
