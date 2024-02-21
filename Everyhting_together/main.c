@@ -37,10 +37,10 @@ void free_char(void* pItem) {
 
 void *print_to_screen(){
     do{
-        printf("start of print loop\n");
+        //printf("start of print loop\n");
         pthread_mutex_lock(&receiving_mutex);
         if(List_count(receiving_list)==0){
-            printf("waiting for message to print\n");
+            //printf("waiting for message to print\n");
             pthread_cond_wait(&receiving_condition_empty, &receiving_mutex);
         }
         char * message = List_trim(receiving_list);
@@ -50,8 +50,8 @@ void *print_to_screen(){
 
         // printf("Your message: ");
         
-        
-        printf("The message that should be printed: %s", message);
+        printf("%s", message);
+        //printf("The message that should be printed: %s", message);
         // for(int j = 0; j < strlen(message); j++){
         //     putchar(message[j]);
         //     fflush(stdout);
@@ -59,22 +59,20 @@ void *print_to_screen(){
         // }
         
         free(message);
-        printf("end of print loop\n");
+        //printf("end of print loop\n");
         
     }while(stop);
-    printf("after of print loop\n");
+    //printf("after of print loop\n");
 }
 
 void *get_user_input(){
     char * input;
     do{
-        printf("start of input loop\n");
-        input = (char*) malloc(MAX_BUFFER);
+        //printf("start of input loop\n");
+        input = (char*)malloc(MAX_BUFFER);
         fgets(input, MAX_BUFFER, stdin);
-        // input[MAX_BUFFER - 1] = '\0';
-        // printf("%ld", sizeof(input));
+        //printf("sanity check message: %s\n", input);
 
-        
         // make sure there is space on the sending list 
         // and more sure no one is using it right now
         // then prepend the message to the list
@@ -95,10 +93,10 @@ void *get_user_input(){
 
         }
 
-        printf("end of input loop\n");
+        //printf("end of input loop\n");
 
     }while(stop);
-    printf("after of input loop\n");
+    //printf("after of input loop\n");
 }
 
 void *send_message(void *arg){
@@ -108,11 +106,11 @@ void *send_message(void *arg){
     struct sockaddr sending_addr = send->addr;
 
     do{
-        printf("start of sending loop\n");
+        //printf("start of sending loop\n");
         // take something off the list
         pthread_mutex_lock(&sending_mutex);
         if(List_count(sending_list)==0){
-            printf("waiting for message to send\n");
+            //printf("waiting for message to send\n");
             pthread_cond_wait(&sending_condition_empty, &sending_mutex);
         }
         char * message = List_trim(sending_list);
@@ -121,16 +119,16 @@ void *send_message(void *arg){
         
         //printf("message right before being sent: %s\n", message);
         // send the message over the socket to the other address
-        if(sendto( socket_desc, message, sizeof(message), 0, &(sending_addr), sizeof(sending_addr)) < 0){
+        if(sendto( socket_desc, message, MAX_BUFFER, 0, &(sending_addr), sizeof(sending_addr)) < 0){
         printf("Unable to send message\n");
         }
         
 
         free(message);
-        printf("end of sending loop\n");
+        //printf("end of sending loop\n");
 
     }while(stop);
-    printf("after of sending loop\n");
+    //printf("after of sending loop\n");
     
 }
 
@@ -140,15 +138,15 @@ void *receive_message(void * arg){
     int socket_desc = *((int*)(arg));
 
     do{
-        printf("start of receive loop\n");
+        //printf("start of receive loop\n");
+
         // receiving a message from the socket
         receive = (char*) malloc(MAX_BUFFER);
-        // int i = sizeof(receive);
-        // printf("size of receivable message %d\n", i);
-        recvfrom(socket_desc, receive, sizeof(receive), 0, NULL, NULL);
-        //fprintf(stderr, "recvfrom: %s(%d)\n", strerror(errno), errno);
         
+        recvfrom(socket_desc, receive, MAX_BUFFER, 0, NULL, NULL);
+        //fprintf(stderr, "recvfrom: %s(%d)\n", strerror(errno), errno);
         //printf("print from receive: %s\n", receive);
+
         // put the message on the list
         pthread_mutex_lock(&receiving_mutex);
         if(List_count(receiving_list)== LIST_MAX_NUM_NODES){
@@ -166,9 +164,9 @@ void *receive_message(void * arg){
             pthread_cond_signal(&receiving_condition_full);
         }
 
-        printf("end of receive loop\n");
+        //printf("end of receive loop\n");
     }while(stop);
-    printf("after of receive loop\n");
+    //printf("after of receive loop\n");
     
 
 }
@@ -248,7 +246,7 @@ int main(int argc, char *argv[]) {
     // Receive message from socket
     int *test = (int*)malloc(sizeof(socket_desc));
     *test = socket_desc;
-    printf("socket description %d\n", *test);
+    
     struct Thread_args send;
     send.addr = sending_addr;
     send.socket_desc = test;
@@ -264,17 +262,21 @@ int main(int argc, char *argv[]) {
     /* wait we run the risk of executing an exit which will terminate */
     /* the process and all threads before the threads have completed. */
     
-    pthread_join( threadUserImput, NULL);
+    
     pthread_join( threadScreen, NULL); 
-
+    if(stop == 0){
+        pthread_cancel(threadReceive);
+        pthread_cancel(threadUserImput);
+    }
+    pthread_join( threadUserImput, NULL);
     pthread_join( threadReceive, NULL);  
     pthread_join( threadSend, NULL);
     free(test);
     close(socket_desc);
-    printf("Thread Keybaord returns: %d\n",iret1);
-    printf("Thread Screen returns: %d\n",iret2);
-    printf("Thread Receive returns: %d\n",iret3);
-    printf("Thread Send returns: %d\n",iret4);
+    //printf("Thread Keybaord returns: %d\n",iret1);
+    //printf("Thread Screen returns: %d\n",iret2);
+    //printf("Thread Receive returns: %d\n",iret3);
+    //printf("Thread Send returns: %d\n",iret4);
     
     
     // free the lists
@@ -292,5 +294,4 @@ int main(int argc, char *argv[]) {
     pthread_cond_destroy(&sending_condition_full);
     
     return 0;
-    // katieTesting_function();
 }
