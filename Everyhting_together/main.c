@@ -23,6 +23,7 @@ pthread_cond_t sending_condition_empty;
 pthread_cond_t sending_condition_full;
 int stop;
 
+// struct to pass socket address and socket desciption to thread
 struct Thread_args{
     struct sockaddr addr;
     int *socket_desc;
@@ -107,6 +108,7 @@ void *send_message(void *arg){
 
     do{
         //printf("start of sending loop\n");
+
         // take something off the list
         pthread_mutex_lock(&sending_mutex);
         if(List_count(sending_list)==0){
@@ -118,6 +120,7 @@ void *send_message(void *arg){
         pthread_mutex_unlock(&sending_mutex);
         
         //printf("message right before being sent: %s\n", message);
+        
         // send the message over the socket to the other address
         if(sendto( socket_desc, message, MAX_BUFFER, 0, &(sending_addr), sizeof(sending_addr)) < 0){
         printf("Unable to send message\n");

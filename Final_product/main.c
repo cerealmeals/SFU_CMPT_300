@@ -7,7 +7,6 @@
 #include <unistd.h> 
 #include <pthread.h>
 #include "list.h"
-#include "sleep.h"
 #include <errno.h>
 
 #define MAX_BUFFER 256
@@ -125,7 +124,6 @@ void *receive_message(void * arg){
         receive = (char*) malloc(MAX_BUFFER);
         
         recvfrom(socket_desc, receive, MAX_BUFFER, 0, NULL, NULL);
-        //fprintf(stderr, "recvfrom: %s(%d)\n", strerror(errno), errno);
 
         // put the message on the list
         pthread_mutex_lock(&receiving_mutex);
