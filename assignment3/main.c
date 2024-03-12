@@ -1,8 +1,13 @@
 #include <stdio.h>
 #include "list.h"
+#include "Structures_functions.h"
 
 int main()
 
+struct PCB init;
+init.ID = 0;
+init.priority = 0;
+init.state = RUNNING;
 // initialization stuff...
 // like the 5 list that make the queues...
 // 
