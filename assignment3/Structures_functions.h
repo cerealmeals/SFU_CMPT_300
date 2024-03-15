@@ -8,9 +8,10 @@ struct PCB{
     int priority;
     int state;
     char msg[40];
-}
+};
 
 struct semaphore{
     int mutex;
     List* blocked_on_this_semaphore;
-}
+};
+

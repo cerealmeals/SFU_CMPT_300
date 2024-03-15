@@ -6,17 +6,19 @@
 int main(){
 
 
-    printf("type command line stuff");
-    char what[40];
-    scanf(what)
-
-    const char s[2] = " ";
-
-    char* c, paramater1, paramater2;
+    printf("type command line stuff\n");
+    char c[2];
+    scanf("%s",c);
     
-    c = strtok(what, s);
-    paramater1 = strtok(what, s);
-    paramater2 = strtok(what, s);
+    char parameter1[10];
+    scanf("%s",parameter1);
+
+    char parameter2[40];
+    scanf("%s",parameter2);
+
+    printf("The first parameter: %s\n", c);
+    printf("The second parameter: %s\n", parameter1);
+    printf("The third parameter: %s\n", parameter2);
 
     return 0;
 }

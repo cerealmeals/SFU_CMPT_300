@@ -2,7 +2,7 @@
 #include "list.h"
 #include "Structures_functions.h"
 
-int main()
+int main(){
 
 struct PCB init;
 init.ID = 0;
@@ -11,62 +11,76 @@ init.state = RUNNING;
 // initialization stuff...
 // like the 5 list that make the queues...
 // 
+List* highPriorityQueue = List_create();
+List* normPriorityQueue = List_create();
+List* lowPriorityQueue = List_create();
+List* sendQueue = List_create();
+List* receiveQueue = List_create();
 
-while(1) // not infinite but for now...
-{
+struct PCB running_PCB;
+running_PCB.ID = -1;
+running_PCB.priority = -1;
+running_PCB.state = RUNNING;
 
-    // get user input
-    char c; // first letter of the scanf
 
-    scanf()
-    //break it into space separeted stuff...
 
-    
-    
-    switch(c){
-        case 'C' : // Sam
-            break;
 
-        case 'F' :  // Kaite
-            break;
+    while(1) // not infinite but for now...
+    {
+        printf("waiting for next command\n");
+        // get user input
+        char c[2]; // first letter of the scanf
 
-        case 'K' :  // Sam
-            break;
+        scanf("%s", c);
+        //break it into space separeted stuff...
 
-        case 'E' :  // Sam
-            break;
+        
+        
+        switch(c[0]){
+            case 'C' : // Sam
+                printf("did it get into Create?\n");
+                break;
 
-        case 'Q' :  // Sam
-            break;
+            case 'F' :  // Kaite
+                printf("did it get into Fork?\n");
+                break;
 
-        case 'S' :  // Katie
-            break;
+            case 'K' :  // Sam
+                break;
 
-        case 'R' :  // Katie
-            break;
-            
-        case 'Y' :  // Katie
-            break;
+            case 'E' :  // Sam
+                break;
 
-        case 'N' :  // Sam
-            break;
+            case 'Q' :  // Sam
+                break;
 
-        case 'P' :  // Sam
-            break;
+            case 'S' :  // Katie
+                break;
 
-        case 'V' :  // Sam
-            break;
+            case 'R' :  // Katie
+                break;
+                
+            case 'Y' :  // Katie
+                break;
 
-        case 'I' :  // Katie
-            break;
+            case 'N' :  // Sam
+                break;
 
-        case 'T' :  // Katie
-            break;
+            case 'P' :  // Sam
+                break;
 
-        default:    
-            // looping
+            case 'V' :  // Sam
+                break;
+
+            case 'I' :  // Katie
+                break;
+
+            case 'T' :  // Katie
+                break;
+
+            default:    
+                // looping
+        }
     }
-
-
-
+    return 0;
 }
