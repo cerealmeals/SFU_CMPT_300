@@ -4,6 +4,7 @@
 #define BLOCKED 2
 
 // Structures
+typeof struct PCB pcb
 struct PCB{
     int ID;
     int priority;
