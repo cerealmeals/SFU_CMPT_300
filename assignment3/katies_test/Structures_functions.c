@@ -7,9 +7,12 @@
 int forkProcess()
 {
     // if "init" process, return -1
+    if (init_process.state == 0)
+        return -1;
 
     // copy current process
-
+    PCB* copy_process;
+    
     // put it into the ready queue
 
 }

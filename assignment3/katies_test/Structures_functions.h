@@ -3,6 +3,7 @@
 #define READY 1
 #define BLOCKED 2
 
+// Structures
 struct PCB{
     int ID;
     int priority;
@@ -15,6 +16,18 @@ struct semaphore{
     List* blocked_on_this_semaphore;
 };
 
+// Processes
+PCB* initProcess;
+PCB* runningProcess;
+
+// 5 Queues, 3 ready queues with priority, 1 send and 1 receive
+List* highPriorityQueue;
+List* normPriorityQueue;
+List* lowPriorityQueue;
+List* sendQueue;
+List* receiveQueue;
+
+// Functions
 int forkProcess();
 int sendProcess(int pID, char* msg);
 void receiveProcess();
