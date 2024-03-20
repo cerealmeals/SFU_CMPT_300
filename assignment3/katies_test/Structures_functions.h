@@ -35,3 +35,4 @@ void receiveProcess();
 int replyProcess(int pID, char* msg);
 void procInfo(int pID);
 void totalInfo();
+void* schedule_next_runningProcess();
