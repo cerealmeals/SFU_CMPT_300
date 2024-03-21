@@ -18,21 +18,21 @@ struct semaphore{
 };
 
 // Processes
-PCB* initProcess;
-PCB* runningProcess;
+extern PCB* initProcess;
+extern PCB* runningProcess;
 
 // 5 Queues, 3 ready queues with priority, 1 send and 1 receive
-List* highPriorityQueue;
-List* normPriorityQueue;
-List* lowPriorityQueue;
-List* sendQueue;
-List* receiveQueue;
+extern List* highPriorityQueue;
+extern List* normPriorityQueue;
+extern List* lowPriorityQueue;
+extern List* sendQueue;
+extern List* receiveQueue;
 
 // Functions
 int forkProcess();
+void* nextRunningProcess();
 int sendProcess(int pID, char* msg);
 void receiveProcess();
 int replyProcess(int pID, char* msg);
 void procInfo(int pID);
 void totalInfo();
-void* schedule_next_runningProcess();

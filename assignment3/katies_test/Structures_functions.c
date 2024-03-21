@@ -1,5 +1,18 @@
 #include "Structures_functions.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Processes
+PCB* initProcess;
+PCB* runningProcess;
+
+// 5 Queues, 3 ready queues with priority, 1 send and 1 receive
+List* highPriorityQueue;
+List* normPriorityQueue;
+List* lowPriorityQueue;
+List* sendQueue;
+List* receiveQueue;
 
 // Copy the currently running process and put it on the ready
 // Q corresponding to the original process' priority.
@@ -32,6 +45,60 @@ int forkProcess()
     {
         List_append(lowPriorityQueue, (void*)copy_process);
     }
+}
+
+// schedule next running process
+void* nextRunningProcess()
+{
+    int number_of_high_pro = List_count(highPriorityQueue);
+    int number_of_norm_pro = List_count(normPriorityQueue);
+    int number_of_low_pro = List_count(lowPriorityQueue);
+
+    int currentPriority = runningProcess->priority;
+
+    // if no more processes in ready queue, use initial process
+    if (number_of_high_pro+number_of_norm_pro+number_of_low_pro==0)
+    {
+        runningProcess = initProcess;
+        runningProcess->state = RUNNING;
+        return;
+    }
+
+    if (currentPriority == 0)
+    {
+        // prevent lower priority from staving
+        if (number_of_norm_pro - number_of_high_pro > 2)
+        {
+            runningProcess = List_first(normPriorityQueue);
+            List_remove(normPriorityQueue);
+        }
+        else
+        {
+            runningProcess = List_first(highPriorityQueue);
+            List_remove(highPriorityQueue);
+        }
+    }
+    else if (currentPriority == 1)
+    {
+        if (number_of_low_pro - number_of_norm_pro > 2)
+        {
+            runningProcess = List_first(lowPriorityQueue);
+            List_remove(lowPriorityQueue);
+        }
+        else
+        {
+            runningProcess = List_first(normPriorityQueue);
+            List_remove(normPriorityQueue);
+        }
+    }
+    else if (currentPriority == 2)
+    {
+        runningProcess = List_first(lowPriorityQueue);
+        List_remove(lowPriorityQueue);
+    }
+
+    runningProcess->state = RUNNING;
+    return;
 }
 
 // send a message to another process - block until reply
@@ -138,6 +205,7 @@ int sendProcess(int pID, char* msg)
         }
     }
 
+
     // send the message
     if (doYouFoundID)
     {
@@ -153,7 +221,7 @@ int sendProcess(int pID, char* msg)
         List_append(sendQueue, (void*)runningProcess);
 
         // decide next running process
-        runningProcess = schedule_next_runningProcess();
+        runningProcess = nextRunningProcess();
 
         // print scheduling infomation
         printf("The id of running process now is: %d, the priority is: %d.\n", runningProcess->ID, runningProcess->priority);
@@ -164,59 +232,6 @@ int sendProcess(int pID, char* msg)
     return -1;
 }
 
-// schedule next running process
-void* schedule_next_runningProcess()
-{
-    int number_of_high_pro = List_count(highPriorityQueue);
-    int number_of_norm_pro = List_count(normPriorityQueue);
-    int number_of_low_pro = List_count(lowPriorityQueue);
-
-    int currentPriority = runningProcess->priority;
-
-    // if no more processes in ready queue, use initial process
-    if (number_of_high_pro+number_of_norm_pro+number_of_low_pro==0)
-    {
-        runningProcess = initProcess;
-        runningProcess->state = RUNNING;
-        return;
-    }
-
-    if (currentPriority == 0)
-    {
-        // prevent lower priority from staving
-        if (number_of_norm_pro - number_of_high_pro > 2)
-        {
-            runningProcess = List_first(normPriorityQueue);
-            List_remove(normPriorityQueue);
-        }
-        else
-        {
-            runningProcess = List_first(highPriorityQueue);
-            List_remove(highPriorityQueue);
-        }
-    }
-    else if (currentPriority == 1)
-    {
-        if (number_of_low_pro - number_of_norm_pro > 2)
-        {
-            runningProcess = List_first(lowPriorityQueue);
-            List_remove(lowPriorityQueue);
-        }
-        else
-        {
-            runningProcess = List_first(normPriorityQueue);
-            List_remove(normPriorityQueue);
-        }
-    }
-    else if (currentPriority == 2)
-    {
-        runningProcess = List_first(lowPriorityQueue);
-        List_remove(lowPriorityQueue);
-    }
-
-    runningProcess->state = RUNNING;
-    return;
-}
 
 
 // receive a message - block until one arrives
@@ -233,7 +248,7 @@ void receiveProcess()
             runningProcess->state = 2;
             List_append(receiveQueue, runningProcess);
         }
-        schedule_next_runningProcess();
+        nextRunningProcess();
         printf("The id of running process now is: %d, the priority is: %d.\n", runningProcess->ID, runningProcess->priority);
 
     }
