@@ -4,8 +4,8 @@
 #define BLOCKED 2
 
 // Structures
-typeof struct PCB pcb
-struct PCB{
+typedef struct pcb PCB;
+struct pcb{
     int ID;
     int priority;
     int state;
