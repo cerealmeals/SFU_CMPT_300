@@ -3,7 +3,8 @@
 #define READY 1
 #define BLOCKED 2
 
-struct PCB{
+typedef struct PCB_s PCB
+struct PCB_s{
     int ID;
     int priority;
     int state;
@@ -11,17 +12,20 @@ struct PCB{
 };
 
 struct semaphore{
-    int mutex;
-    List* blocked_on_this_semaphore;
+    int mutex[4];
+    List* blocked_on_this_semaphore[4];
+    bool initialized[4] = {0,0,0,0,0};
 };
 
 
-void Create_Proccess(int id, int prio, struct PCB* currently_running, List*queue);
+void Create_Proccess(int id, int prio, PCB* currently_running, List*queue);
 
-void Kill_Proccess(int id, struct PCB* currently_running, List*high, List*norm, List*low);
+int Kill_Proccess(int id, PCB init, PCB* currently_running, List*high, List*norm, List*low);
 
-void Exit_Running_Proccess(struct PCB* currently_running, List*high, List*norm, List*low);
+int Exit_Running_Proccess(PCB init, PCB* currently_running, List*high, List*norm, List*low);
 
 bool compare(void* arg1, void* arg2);
 
-void fill_in_running_with_next_process();
+void fill_in_running_with_next_process(PCB init, PCB* currently_running, List*high, List*norm, List*low);
+
+void Create_New_sem(List* semaphores, int sem_id, int count);
