@@ -11,9 +11,9 @@ void Create_Proccess(int id, int prio,  PCB* currently_running, List* queue){
 
     if(currently_running->ID == 0){
         proccess->state = RUNNING;
-        currently_running->ID = id;
-        currently_running->priority = prio;
-        printf("Proccess with ID: %d replace the init proccess and is now running\n", id);
+        *currently_running = *proccess;
+        printf("Proccess with ID: %d replaced the init proccess and is now running\n", id);
+        printf("withing create, running ID: %d\n", currently_running->ID);
     }
     else{
         int check = List_append(queue, proccess);
@@ -28,7 +28,7 @@ void Create_Proccess(int id, int prio,  PCB* currently_running, List* queue){
 }
 
 
-int Kill_Proccess(int id, PCB init, PCB* currently_running, List*high, List*norm, List*low){
+int Kill_Proccess(int id, PCB* init, PCB* currently_running, List*high, List*norm, List*low){
     // search the Queue given
     List_first(high);
     List_first(norm);
@@ -94,19 +94,21 @@ bool compare(void* arg1, void* arg2){
     }
 }
 
-int Exit_Running_Proccess(PCB init, PCB* currently_running, List*high, List*norm, List*low){
+int Exit_Running_Proccess(PCB* init, PCB* currently_running, List*high, List*norm, List*low){
     if(currently_running->ID == 0){
         // end the program because the only process is the init process
+        printf("Within Exit, you killed the init process\n");
         return 0;
     }
     else{
+        printf("You killed the currently running process it had ID %d\n", currently_running->ID);
         free(currently_running);
         fill_in_running_with_next_process(init, currently_running, high, norm, low);
         return 1;
     }
 }
 
-void fill_in_running_with_next_process(PCB init, PCB* currently_running, List*high, List*norm, List*low){
+void fill_in_running_with_next_process(PCB* init, PCB* currently_running, List*high, List*norm, List*low){
     /*  My theory here to prevent starvation is that every time you go through the entire high priority list
         a single normal priority process should get a turn. The same thing happens for
         normal top low priority.
@@ -125,7 +127,7 @@ void fill_in_running_with_next_process(PCB init, PCB* currently_running, List*hi
         currently_running = List_first(high);
         List_remove(high);
         currently_running->state = RUNNING;
-
+        printf("The new Running process had ID %d\nIt was taken for the high priority queue\n", currently_running->ID);
         track_high++;                       // count how many times you have taken the high priority queue
         if(track_high > high_cap){          // if you have gone through the entire list its normal priority turn
             track_high = 0;                 //reset the tracking
@@ -143,6 +145,7 @@ void fill_in_running_with_next_process(PCB init, PCB* currently_running, List*hi
     else if(norm_turn && (0 != List_count(norm))){
         currently_running = List_first(norm);
         List_remove(norm);
+        printf("The new Running process had ID %d\nIt was taken for the normal priority queue\n", currently_running->ID);
         currently_running->state = RUNNING;
         track_norm++;
         high_turn = 1;
@@ -151,6 +154,7 @@ void fill_in_running_with_next_process(PCB init, PCB* currently_running, List*hi
         currently_running = List_first(low);
         List_remove(low);
         currently_running->state = RUNNING;
+        printf("The new Running process had ID %d\nIt was taken for the low priority queue\n", currently_running->ID);
         high_turn = 1;
     }
     else{
@@ -159,21 +163,25 @@ void fill_in_running_with_next_process(PCB init, PCB* currently_running, List*hi
             currently_running = List_first(high);
             List_remove(high);
             currently_running->state = RUNNING;
+            printf("The new Running process had ID %d\nIt was taken for the high priority queue\n", currently_running->ID);
         }
         else if(0 != List_count(norm)){
             currently_running = List_first(norm);
             List_remove(norm);
             currently_running->state = RUNNING;
+            printf("The new Running process had ID %d\nIt was taken for the normal priority queue\n", currently_running->ID);
         }
         else if(0 != List_count(low)){
             currently_running = List_first(low);
             List_remove(low);
             currently_running->state = RUNNING;
+            printf("The new Running process had ID %d\nIt was taken for the low priority queue\n", currently_running->ID);
         }
 
         // then if all those fail there is nothing to do so set the init process to running
         currently_running = &init;
         currently_running->state = RUNNING;
+        printf("The new Running proces is the init process because there are no other process");
     }
 
 }

@@ -21,13 +21,14 @@ List* receiveQueue = List_create();
 Semaphore semaphores[4];
 int how_many_semaphores_are_currently_in_use = 0;
 
-PCB* running_PCB;
-running_PCB = &init;
+PCB running_PCB;
+running_PCB = init;
 
 int stop = 1;
 while(stop) // not infinite but for now...
     {
     printf("waiting for next command\n");
+    printf("Main, running ID:%d\n", running_PCB.ID);
     // get user input
     char c[2]; // first letter of the scanf
 
@@ -44,13 +45,13 @@ while(stop) // not infinite but for now...
             scanf("%d", &ID);
             scanf("%d", &Priority);
             if(Priority == 0){
-                Create_Proccess(ID, Priority, running_PCB, highPriorityQueue);
+                Create_Proccess(ID, Priority, &running_PCB, highPriorityQueue);
             }
             else if(Priority == 1){
-                Create_Proccess(ID, Priority, running_PCB, normPriorityQueue);
+                Create_Proccess(ID, Priority, &running_PCB, normPriorityQueue);
             }
             else{
-                Create_Proccess(ID, Priority, running_PCB, lowPriorityQueue);
+                Create_Proccess(ID, Priority, &running_PCB, lowPriorityQueue);
             }
             
             break;
@@ -62,26 +63,26 @@ while(stop) // not infinite but for now...
         case 'K' :  // Sam
             printf("did it get into Kill?\n");
             scanf("%d", &ID);
-            stop = Kill_Proccess(ID, init, running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue);
+            stop = Kill_Proccess(ID, &init, &running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue);
             break;
 
         case 'E' :  // Sam
             printf("did it get into Exit?\n");
-            stop = Exit_Running_Proccess(init, running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue);
+            stop = Exit_Running_Proccess(&init, &running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue);
             break;
 
         case 'Q' :  // Sam
             printf("did it get into Quantum?\n");
-            if(running_PCB->priority == 0){
-                List_append(highPriorityQueue, running_PCB);
+            if(running_PCB.priority == 0){
+                List_append(highPriorityQueue, &running_PCB);
             }
-            else if(running_PCB->priority == 1){
-                List_append(normPriorityQueue, running_PCB);
+            else if(running_PCB.priority == 1){
+                List_append(normPriorityQueue, &running_PCB);
             }
             else{
-                List_append(lowPriorityQueue, running_PCB);
+                List_append(lowPriorityQueue, &running_PCB);
             }
-            fill_in_running_with_next_process(init, running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue);
+            fill_in_running_with_next_process(&init, &running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue);
             break;
 
         case 'S' :  // Katie

@@ -21,12 +21,12 @@ struct Semaphore_s{
 
 void Create_Proccess(int id, int prio, PCB* currently_running, List*queue);
 
-int Kill_Proccess(int id, PCB init, PCB* currently_running, List*high, List*norm, List*low);
+int Kill_Proccess(int id, PCB* init, PCB* currently_running, List*high, List*norm, List*low);
 
-int Exit_Running_Proccess(PCB init, PCB* currently_running, List*high, List*norm, List*low);
+int Exit_Running_Proccess(PCB* init, PCB* currently_running, List*high, List*norm, List*low);
 
 bool compare(void* arg1, void* arg2);
 
-void fill_in_running_with_next_process(PCB init, PCB* currently_running, List*high, List*norm, List*low);
+void fill_in_running_with_next_process(PCB* init, PCB* currently_running, List*high, List*norm, List*low);
 
 void Create_New_sem(Semaphore* semaphores, int sem_id, int count);
