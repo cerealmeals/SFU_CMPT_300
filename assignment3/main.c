@@ -4,7 +4,7 @@
 
 int main(){
 
-struct PCB init;
+PCB init;
 init.ID = 0;
 init.priority = 2;
 init.state = RUNNING;
@@ -18,13 +18,11 @@ List* sendQueue = List_create();
 List* receiveQueue = List_create();
 
 //stuff to keep track of semaphores
-List* semaphores;
-int how_many_semaphores_are_currently_in_use
+Semaphore semaphores[4];
+int how_many_semaphores_are_currently_in_use = 0;
 
-struct PCB* running_PCB;
-running_PCB->ID = 0;
-running_PCB->priority = 2;
-running_PCB->state = RUNNING;
+PCB* running_PCB;
+running_PCB = &init;
 
 int stop = 1;
 while(stop) // not infinite but for now...
@@ -37,14 +35,14 @@ while(stop) // not infinite but for now...
     //break it into space separeted stuff...
 
     
-    
+    int ID;
+    int Priority;
+    int sem_ID;
     switch(c[0]){
         case 'C' : // Sam
             printf("did it get into Create?\n");
-            int ID;
-            int Priority;
-            scanf("%d", ID);
-            scanf("%d", Priority);
+            scanf("%d", &ID);
+            scanf("%d", &Priority);
             if(Priority == 0){
                 Create_Proccess(ID, Priority, running_PCB, highPriorityQueue);
             }
@@ -63,30 +61,29 @@ while(stop) // not infinite but for now...
 
         case 'K' :  // Sam
             printf("did it get into Kill?\n");
-            int ID;
-            scanf("%d", ID);
-            stop = Kill_Proccess(ID, running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue);
+            scanf("%d", &ID);
+            stop = Kill_Proccess(ID, init, running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue);
             break;
 
         case 'E' :  // Sam
             printf("did it get into Exit?\n");
-            stop = Exit_Running_Proccess(running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue);
+            stop = Exit_Running_Proccess(init, running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue);
             break;
 
         case 'Q' :  // Sam
             printf("did it get into Quantum?\n");
-            if(currently_running->priority = 0){
-                List_append(high, currently_running);
+            if(running_PCB->priority == 0){
+                List_append(highPriorityQueue, running_PCB);
             }
-            else if(currently_running = 1){
-                List_append(norm, currently_running);
+            else if(running_PCB->priority == 1){
+                List_append(normPriorityQueue, running_PCB);
             }
             else{
-                List_append(low, currently_running);
+                List_append(lowPriorityQueue, running_PCB);
             }
-            fill_in_running_with_next_process(init, currently_running, highPriorityQueue, normPriorityQueue, lowPriorityQueue);
+            fill_in_running_with_next_process(init, running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue);
             break;
-+
+
         case 'S' :  // Katie
             break;
 
@@ -97,20 +94,16 @@ while(stop) // not infinite but for now...
             break;
 
         case 'N' :  // Sam
-            int sem_ID
-            scanf("%d", sem_ID);
-            Create_New_sem(semaphores, sem_ID, how_many_semaphores_are_currently_in_use)
+            scanf("%d", &sem_ID);
+            Create_New_sem(semaphores, sem_ID, how_many_semaphores_are_currently_in_use);
             break;
 
         case 'P' :  // Sam
-            int sem_ID
-            scanf("%d", sem_ID);
-
+            scanf("%d", &sem_ID);
             break;
 
         case 'V' :  // Sam
-            int sem_ID
-            scanf("%d", sem_ID);
+            scanf("%d", &sem_ID);
 
             break;
 
@@ -121,13 +114,11 @@ while(stop) // not infinite but for now...
             break;
 
         default:
-            printf("The letter %c is not a command\n
-                Your choices are C, F, K, E, Q, S, R, Y, N, P, V, I, T.\n
-                They are case sensitive\n", c);
+            printf("The letter %c is not a command\nYour choices are C, F, K, E, Q, S, R, Y, N, P, V, I, T.\nThey are case sensitive\n", c[0]);
     }
-    printf("you killed the init process the program is ending\n");
+    
 }
     //free all those lists even though you shouldn't need to
-
+    printf("you killed the init process the program is ending\n");
     return 0;
 }

@@ -1,14 +1,15 @@
 #include "Structures_functions.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 void Create_Proccess(int id, int prio,  PCB* currently_running, List* queue){
-    struct PCB* proccess = (struct PCB*)malloc(sizeof(PCB));
+    PCB* proccess = (PCB*)malloc(sizeof(PCB));
 
     proccess->ID = id;
     proccess->priority = prio;
     proccess->state = READY;
 
-    if(currently_running.ID = 0){
+    if(currently_running->ID == 0){
         proccess->state = RUNNING;
         currently_running->ID = id;
         currently_running->priority = prio;
@@ -40,10 +41,9 @@ int Kill_Proccess(int id, PCB init, PCB* currently_running, List*high, List*norm
         //check currently running process
         if(currently_running->ID == id){
             // free the running process and get a new running process
-            free(currently_running;)
+            free(currently_running);
             fill_in_running_with_next_process(init, currently_running, high, norm, low);
-            printf("The process with ID %d was the running process\n
-            it was killed and the new process is now running\n", id);
+            printf("The process with ID %d was the running process\nit was killed and the new process is now running\n", id);
             return 1;
         }
         else if(id == 0){ // 0 is the init process' ID
@@ -57,31 +57,27 @@ int Kill_Proccess(int id, PCB init, PCB* currently_running, List*high, List*norm
         }
         else{
             //user error no process with the ID
-            printf("There is no process with ID %d\n
-            Maybe it is blocked by a semaphor or send/receive queue\n", id);
+            printf("There is no process with ID %d\nMaybe it is blocked by a semaphor or send/receive queue\n", id);
             return 1;
         }
     }
     else if(high_queue != NULL){
         List_remove(high);
         free(high_queue);
-        printf("The process with ID %d was Killed\n
-            It was in the high priority queue\n", id);
+        printf("The process with ID %d was Killed\nIt was in the high priority queue\n", id);
         return 1;
 
     }
     else if(norm_queue != NULL){
         List_remove(norm);
         free(norm_queue);
-        printf("The process with ID %d was Killed\n
-            It was in the normal priority queue\n", id);
+        printf("The process with ID %d was Killed\nIt was in the normal priority queue\n", id);
         return 1;
     }
     else{
         List_remove(low);
         free(low_queue);
-        printf("The process with ID %d was Killed\n
-            It was in the low priority queue\n", id);
+        printf("The process with ID %d was Killed\nIt was in the low priority queue\n", id);
         return 1;
     }
 }
@@ -123,7 +119,7 @@ void fill_in_running_with_next_process(PCB init, PCB* currently_running, List*hi
 
     // start with assuming you should use high priority
     static bool high_turn = 1, norm_turn = 1, low_turn = 1;
-    static int track_high = 0, high_cap = 0; track_norm = 0, norm_cap = 0;
+    static int track_high = 0, high_cap = 0, track_norm = 0, norm_cap = 0;
     // check who's turn it is, and if there is anything in that queue
     if(high_turn && (0 != List_count(high))){
         currently_running = List_first(high);
@@ -176,17 +172,14 @@ void fill_in_running_with_next_process(PCB init, PCB* currently_running, List*hi
         }
 
         // then if all those fail there is nothing to do so set the init process to running
-        currently_running = init;
+        currently_running = &init;
         currently_running->state = RUNNING;
     }
 
 }
 
-void Create_New_sem(List* semaphores, int sem_id, int count){
-    
-    static bool arr[4] = {0,0,0,0,0};
-    
-
+void Create_New_sem(Semaphore* semaphores, int sem_id, int count){
+  
     if(sem_id > count){
         //error checking
         if(sem_id > 4){

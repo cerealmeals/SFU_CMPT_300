@@ -3,7 +3,7 @@
 #define READY 1
 #define BLOCKED 2
 
-typedef struct PCB_s PCB
+typedef struct PCB_s PCB;
 struct PCB_s{
     int ID;
     int priority;
@@ -11,10 +11,11 @@ struct PCB_s{
     char msg[40];
 };
 
-struct semaphore{
-    int mutex[4];
-    List* blocked_on_this_semaphore[4];
-    bool initialized[4] = {0,0,0,0,0};
+typedef struct Semaphore_s Semaphore;
+struct Semaphore_s{
+    int mutex;
+    List* blocked_on_this_semaphore;
+    bool initialized;
 };
 
 
@@ -28,4 +29,4 @@ bool compare(void* arg1, void* arg2);
 
 void fill_in_running_with_next_process(PCB init, PCB* currently_running, List*high, List*norm, List*low);
 
-void Create_New_sem(List* semaphores, int sem_id, int count);
+void Create_New_sem(Semaphore* semaphores, int sem_id, int count);

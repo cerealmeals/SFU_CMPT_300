@@ -10,15 +10,15 @@ int main(){
     char c[2];
     scanf("%s",c);
     
-    char parameter1[10];
-    scanf("%s",parameter1);
+    int ID;
+    scanf("%d",&ID);
 
-    char parameter2[40];
-    scanf("%s",parameter2);
+    int prio;
+    scanf("%d",&prio);
 
     printf("The first parameter: %s\n", c);
-    printf("The second parameter: %s\n", parameter1);
-    printf("The third parameter: %s\n", parameter2);
+    printf("The second parameter: %d\n", ID);
+    printf("The third parameter: %d\n", prio);
 
     return 0;
 }
