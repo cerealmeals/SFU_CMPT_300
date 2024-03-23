@@ -4,33 +4,45 @@
 
 #ifndef _LIST_H_
 #define _LIST_H_
-#include <stdbool.h>
 
 #define LIST_SUCCESS 0
 #define LIST_FAIL -1
 
+#include <stdbool.h>
+
 typedef struct Node_s Node;
 struct Node_s {
     // TODO: You should change this
-    void * item;
-    struct Node_s * previous;
-    struct Node_s * next;
+
+    void* pointer;
+    Node* next;
+    Node* prev;
 };
 
 enum ListOutOfBounds {
     LIST_OOB_START,
     LIST_OOB_END
 };
+
 typedef struct List_s List;
 struct List_s{
     // TODO: You should change this!
-    struct Node_s * current; // // If the current pointer is before or beyond the list, 
-                    // // a routine returning its value will return a NULL pointer. 
-    struct Node_s * head;
-    struct Node_s * tail;
-    unsigned int countNumber;
-    enum ListOutOfBounds boundCheck;
+    
+    int count;
+    Node* current;
+    Node* first;
+    Node* last;
+    List* next;
 };
+
+typedef struct Head_List Free_Heads;
+struct Head_List{
+    int count;
+    List* current;
+};
+
+int free_nodes_count();
+int free_heads_count();
 
 // Maximum number of unique lists the system can support
 // (You may modify this, but reset the value to 10 when handing in your assignment)
@@ -47,56 +59,56 @@ struct List_s{
 
 // Makes a new, empty list, and returns its reference on success. 
 // Returns a NULL pointer on failure.
-List* List_create();  // checked
+List* List_create();
 
 // Returns the number of items in pList.
-int List_count(List* pList);  // checked: matched
+int List_count(List* pList);
 
 // Returns a pointer to the first item in pList and makes the first item the current item.
 // Returns NULL and sets current item to NULL if list is empty.
-void* List_first(List* pList); // checked: first item is null and not null
+void* List_first(List* pList);
 
 // Returns a pointer to the last item in pList and makes the last item the current item.
 // Returns NULL and sets current item to NULL if list is empty.
-void* List_last(List* pList); // checked
+void* List_last(List* pList); 
 
 // Advances pList's current item by one, and returns a pointer to the new current item.
 // If this operation advances the current item beyond the end of the pList, a NULL pointer 
 // is returned and the current item is set to be beyond end of pList.
-void* List_next(List* pList); // checked: null + not null
+void* List_next(List* pList);
 
 // Backs up pList's current item by one, and returns a pointer to the new current item. 
 // If this operation backs up the current item beyond the start of the pList, a NULL pointer 
 // is returned and the current item is set to be before the start of pList.
-void* List_prev(List* pList); // checked: null+ not null
+void* List_prev(List* pList);
 
 // Returns a pointer to the current item in pList.
-void* List_curr(List* pList); // checked
+void* List_curr(List* pList);
 
 // Adds the new item to pList directly after the current item, and makes item the current item. 
 // If the current pointer is before the start of the pList, the item is added at the start. If 
 // the current pointer is beyond the end of the pList, the item is added at the end. 
 // Returns 0 on success, -1 on failure.
-int List_insert_after(List* pList, void* pItem);  // checked? 
+int List_insert_after(List* pList, void* pItem);
 
 // Adds item to pList directly before the current item, and makes the new item the current one. 
 // If the current pointer is before the start of the pList, the item is added at the start. 
 // If the current pointer is beyond the end of the pList, the item is added at the end. 
 // Returns 0 on success, -1 on failure.
-int List_insert_before(List* pList, void* pItem); // checked?
+int List_insert_before(List* pList, void* pItem);
 
 // Adds item to the end of pList, and makes the new item the current one. 
 // Returns 0 on success, -1 on failure.
-int List_append(List* pList, void* pItem); // checked
+int List_append(List* pList, void* pItem);
 
 // Adds item to the front of pList, and makes the new item the current one. 
 // Returns 0 on success, -1 on failure.
-int List_prepend(List* pList, void* pItem); // checked
+int List_prepend(List* pList, void* pItem);
 
 // Return current item and take it out of pList. Make the next item the current one.
 // If the current pointer is before the start of the pList, or beyond the end of the pList,
 // then do not change the pList and return NULL.
-void* List_remove(List* pList); 
+void* List_remove(List* pList);
 
 // Return last item and take it out of pList. Make the new last item the current one.
 // Return NULL if pList is initially empty.
@@ -107,13 +119,14 @@ void* List_trim(List* pList);
 // for future operations.
 void List_concat(List* pList1, List* pList2);
 
+typedef void (*FREE_FN)(void* pItem);
 // Delete pList. pItemFreeFn is a pointer to a routine that frees an item. 
 // It should be invoked (within List_free) as: (*pItemFreeFn)(itemToBeFreedFromNode);
 // pList and all its nodes no longer exists after the operation; its head and nodes are 
 // available for future operations.
-typedef void (*FREE_FN)(void* pItem);
 void List_free(List* pList, FREE_FN pItemFreeFn);
 
+typedef bool (*COMPARATOR_FN)(void* pItem, void* pComparisonArg);
 // Search pList, starting at the current item, until the end is reached or a match is found. 
 // In this context, a match is determined by the comparator parameter. This parameter is a
 // pointer to a routine that takes as its first argument an item pointer, and as its second 
@@ -126,7 +139,6 @@ void List_free(List* pList, FREE_FN pItemFreeFn);
 // 
 // If the current pointer is before the start of the pList, then start searching from
 // the first node in the list (if any).
-typedef bool (*COMPARATOR_FN)(void* pItem, void* pComparisonArg);
 void* List_search(List* pList, COMPARATOR_FN pComparator, void* pComparisonArg);
 
 #endif
