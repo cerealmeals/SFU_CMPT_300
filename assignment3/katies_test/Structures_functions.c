@@ -106,8 +106,8 @@ int Exit_Running_Proccess(PCB* init, PCB* currently_running, List*high, List*nor
     }
     else{
         printf("You killed the currently running process it had ID %d\n", currently_running->ID);
-        free(currently_running);
-        fill_in_running_with_next_process(init, currently_running, high, norm, low);
+        // free(currently_running);
+        // fill_in_running_with_next_process(init, currently_running, high, norm, low);
         return 1;
     }
 }

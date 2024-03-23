@@ -83,6 +83,10 @@ while(stop) // not infinite but for now...
         case 'E' :  // Sam
             printf("did it get into Exit?\n");
             stop = Exit_Running_Proccess(&init, &running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue);
+            if (stop==1)
+            {
+                running_PCB = *nextRunningProcess(&init, &running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue);
+            }
             break;
 
         case 'Q' :  // Sam
