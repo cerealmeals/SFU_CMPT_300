@@ -18,17 +18,20 @@ List* sendQueue = List_create();
 List* receiveQueue = List_create();
 
 //stuff to keep track of semaphores
-Semaphore semaphores[4];
-int how_many_semaphores_are_currently_in_use = 0;
+Semaphore semaphores[5];
+for(int i = 0; i < 5; i++){
+    semaphores[i].initialized = 0;
+}
 
-PCB running_PCB;
-running_PCB = init;
+PCB* running_PCB;
+running_PCB = &init;
 
 int stop = 1;
 while(stop) // not infinite but for now...
     {
-    printf("waiting for next command\n");
-    printf("Main, running ID:%d\n", running_PCB.ID);
+    printf("\nwaiting for next command\n");
+    printf("Main, running ID:%d\n", (running_PCB->ID));
+    printf("Main, address of running PCB:%d\n", running_PCB);
     // get user input
     char c[2]; // first letter of the scanf
 
@@ -39,6 +42,7 @@ while(stop) // not infinite but for now...
     int ID;
     int Priority;
     int sem_ID;
+    int mutex_value;
     switch(c[0]){
         case 'C' : // Sam
             printf("did it get into Create?\n");
@@ -50,33 +54,35 @@ while(stop) // not infinite but for now...
             else if(Priority == 1){
                 Create_Proccess(ID, Priority, &running_PCB, normPriorityQueue);
             }
-            else{
+            else if(Priority == 2){
                 Create_Proccess(ID, Priority, &running_PCB, lowPriorityQueue);
             }
-            
+            else{
+                printf("The Priority can only be 0,1,2\n");
+            }
             break;
 
         case 'F' :  // Kaite
             printf("did it get into Fork?\n");
             break;
 
-        case 'K' :  // Sam
+        case 'K' :  // Sam          The kill command can kill process on the send and receive queue's
             printf("did it get into Kill?\n");
             scanf("%d", &ID);
             stop = Kill_Proccess(ID, &init, &running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue);
             break;
 
-        case 'E' :  // Sam
+        case 'E' :  // Sam          The Exit command can't exit if there are things blocked on the send, receive, or semaphores
             printf("did it get into Exit?\n");
             stop = Exit_Running_Proccess(&init, &running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue);
             break;
 
         case 'Q' :  // Sam
             printf("did it get into Quantum?\n");
-            if(running_PCB.priority == 0){
+            if(running_PCB->priority == 0){
                 List_append(highPriorityQueue, &running_PCB);
             }
-            else if(running_PCB.priority == 1){
+            else if(running_PCB->priority == 1){
                 List_append(normPriorityQueue, &running_PCB);
             }
             else{
@@ -96,16 +102,33 @@ while(stop) // not infinite but for now...
 
         case 'N' :  // Sam
             scanf("%d", &sem_ID);
-            Create_New_sem(semaphores, sem_ID, how_many_semaphores_are_currently_in_use);
+            scanf("%d", &mutex_value);
+            if(sem_ID < 0 || sem_ID > 4){
+                printf("Semaphore's id must be between 0 and 4\n")
+            }
+            else{
+                Create_New_sem(semaphores, sem_ID, mutex_value);
+            }
             break;
 
         case 'P' :  // Sam
             scanf("%d", &sem_ID);
+            if(sem_ID < 0 || sem_ID > 4){
+                printf("Semaphore's id must be between 0 and 4\n")
+            }
+            else{
+                P_sem(semaphores, sem_id, &init, &running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue);
+            }
             break;
 
         case 'V' :  // Sam
             scanf("%d", &sem_ID);
-
+            if(sem_ID < 0 || sem_ID > 4){
+                printf("Semaphore's id must be between 0 and 4\n")
+            }
+            else{
+                V_sem(semaphores, sem_id, highPriorityQueue, normPriorityQueue, lowPriorityQueue);
+            }
             break;
 
         case 'I' :  // Katie
@@ -120,6 +143,6 @@ while(stop) // not infinite but for now...
     
 }
     //free all those lists even though you shouldn't need to
-    printf("you killed the init process the program is ending\n");
+    printf("you killed the init process the simulation is ending\n");
     return 0;
 }
