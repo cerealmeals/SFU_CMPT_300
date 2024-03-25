@@ -4,10 +4,13 @@
 
 int main(){
 
+// the init process
 PCB init;
 init.ID = 0;
 init.priority = 2;
 init.state = RUNNING;
+int how_many_process = 1;
+
 // initialization stuff...
 // like the 5 list that make the queues...
 //
@@ -23,6 +26,7 @@ for(int i = 0; i < 5; i++){
     semaphores[i].initialized = 0;
 }
 
+// the pointer to keep track of the running process
 PCB* running_PCB;
 running_PCB = &init;
 
@@ -42,20 +46,22 @@ while(stop) // not infinite but for now...
     int ID;
     int Priority;
     int sem_ID;
+    char msg[40];
     int mutex_value;
+    int check = 0;
+
     switch(c[0]){
         case 'C' : // Sam
             printf("did it get into Create?\n");
-            scanf("%d", &ID);
             scanf("%d", &Priority);
             if(Priority == 0){
-                Create_Proccess(ID, Priority, &running_PCB, highPriorityQueue);
+                Create_Process(Priority, &running_PCB, highPriorityQueue, how_many_process);
             }
             else if(Priority == 1){
-                Create_Proccess(ID, Priority, &running_PCB, normPriorityQueue);
+                Create_Process(Priority, &running_PCB, normPriorityQueue, how_many_process);
             }
             else if(Priority == 2){
-                Create_Proccess(ID, Priority, &running_PCB, lowPriorityQueue);
+                Create_Process(Priority, &running_PCB, lowPriorityQueue, how_many_process);
             }
             else{
                 printf("The Priority can only be 0,1,2\n");
@@ -63,48 +69,101 @@ while(stop) // not infinite but for now...
             break;
 
         case 'F' :  // Kaite
-            printf("did it get into Fork?\n");
+            printf("***did it get into Fork?***\n");
+            check = forkProcess(&running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue, how_many_process);
+            if (check == -1)
+            {
+                printf("**Fail to fork the process.**\n");
+            }
+            else
+            {
+                printf("**Folk Succeed, the new process ID is %d.**\n", check);
+            }
             break;
 
-        case 'K' :  // Sam          The kill command can kill process on the send and receive queue's
+        case 'K' :  // Sam          The kill command can kill process on the send and receive queue's and can't kill exit if anything is on any queue
             printf("did it get into Kill?\n");
             scanf("%d", &ID);
-            stop = Kill_Proccess(ID, &init, &running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue);
+            stop = Kill_Process(ID, &init, &running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue, sendQueue, receiveQueue, semaphores);
             break;
 
         case 'E' :  // Sam          The Exit command can't exit if there are things blocked on the send, receive, or semaphores
             printf("did it get into Exit?\n");
-            stop = Exit_Running_Proccess(&init, &running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue);
+            stop = Exit_Running_Process(&init, &running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue, sendQueue, receiveQueue, semaphores);
             break;
 
         case 'Q' :  // Sam
             printf("did it get into Quantum?\n");
+            // put the currently running Process on its appropriate queue
             if(running_PCB->priority == 0){
-                List_append(highPriorityQueue, &running_PCB);
+                List_append(highPriorityQueue, running_PCB);
             }
             else if(running_PCB->priority == 1){
-                List_append(normPriorityQueue, &running_PCB);
+                List_append(normPriorityQueue, running_PCB);
             }
             else{
-                List_append(lowPriorityQueue, &running_PCB);
+                List_append(lowPriorityQueue, running_PCB);
             }
             fill_in_running_with_next_process(&init, &running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue);
             break;
 
         case 'S' :  // Katie
+            printf("Get into send!\n");
+            scanf("%d", &ID);
+            fgets(msg, 40, stdin);
+            check = sendProcess(ID, msg, &init, &running_PCB, sendQueue, receiveQueue, highPriorityQueue, normPriorityQueue, lowPriorityQueue, semaphores);
+            
+            if (check==-1)
+            {
+                printf("Failed to send messages, can't find the process\n");
+            }
+            else if(check == 1){
+                printf("The init process cannot send since I cannot be blocked\n");
+            }
+            else
+            {
+                // decide next running process
+                fill_in_running_with_next_process(&init, &running_PCB, highPriorityQueue, normPriorityQueue,lowPriorityQueue);
+                // running_PCB = *nextRunningProcess(&init, &running_PCB, highPriorityQueue, normPriorityQueue,lowPriorityQueue);
+
+                // print scheduling infomation
+                // printf("***The id of running process now is: %d, the priority is: %d.\n", running_PCB->ID, running_PCB->priority);
+            }
             break;
 
         case 'R' :  // Katie
+            printf("Get into receive\n");
+            check = receiveProcess(&running_PCB, receiveQueue, sendQueue);
+            
+            if (check==-1)
+            {
+                fill_in_running_with_next_process(&init, &running_PCB, highPriorityQueue, normPriorityQueue,lowPriorityQueue);
+                // printf("Failed to receive messages, no message coming\n");  
+                // // decide next running process
+                // running_PCB = *nextRunningProcess(&init, &running_PCB, highPriorityQueue, normPriorityQueue,lowPriorityQueue);
+
+                // // print scheduling infomation
+                // printf("***The id of running process now is: %d, the priority is: %d.\n", running_PCB.ID, running_PCB.priority);         
+            }
             break;
             
         case 'Y' :  // Katie
+            printf("Get into reply\n");
+            scanf("%d", &ID);
+            // printf("Input message:\n");
+            fgets(msg, 40, stdin);
+            check = replyProcess(ID, msg, sendQueue, highPriorityQueue, normPriorityQueue, lowPriorityQueue);
+            if (check == -1)
+            {
+                printf("Failed to reply, cound't find the receiver\n");
+            }
             break;
 
         case 'N' :  // Sam
             scanf("%d", &sem_ID);
             scanf("%d", &mutex_value);
             if(sem_ID < 0 || sem_ID > 4){
-                printf("Semaphore's id must be between 0 and 4\n")
+                printf("Semaphore's id must be between 0 and 4\n");
             }
             else{
                 Create_New_sem(semaphores, sem_ID, mutex_value);
@@ -114,27 +173,37 @@ while(stop) // not infinite but for now...
         case 'P' :  // Sam
             scanf("%d", &sem_ID);
             if(sem_ID < 0 || sem_ID > 4){
-                printf("Semaphore's id must be between 0 and 4\n")
+                printf("Semaphore's id must be between 0 and 4\n");
             }
             else{
-                P_sem(semaphores, sem_id, &init, &running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue);
+                P_sem(semaphores, sem_ID, &init, &running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue);
             }
             break;
 
         case 'V' :  // Sam
             scanf("%d", &sem_ID);
             if(sem_ID < 0 || sem_ID > 4){
-                printf("Semaphore's id must be between 0 and 4\n")
+                printf("Semaphore's id must be between 0 and 4\n");
             }
             else{
-                V_sem(semaphores, sem_id, highPriorityQueue, normPriorityQueue, lowPriorityQueue);
+                V_sem(semaphores, sem_ID, &running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue);
             }
             break;
 
         case 'I' :  // Katie
+            printf("Get into process info!\n");
+            scanf("%d", &ID);
+            check = procInfo(ID, &init, &running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue, receiveQueue, sendQueue, semaphores);
+            if (check == -1)
+            {
+                printf("**There is no process with ID: %d**\n", ID);
+            }
             break;
 
         case 'T' :  // Katie
+            // working
+            printf("Get into total info!\n");
+            totalInfo(&init, &running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue, receiveQueue, sendQueue, semaphores);
             break;
 
         default:
