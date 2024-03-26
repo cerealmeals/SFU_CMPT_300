@@ -172,7 +172,6 @@ int Exit_Running_Process(PCB* init, PCB** currently_running, List*high, List*nor
     }
     else{
         printf("You killed the currently running process it had ID %d\n", ((*currently_running)->ID));
-        printf("withing Exit, address memory trying to kill: %d\n", *currently_running);
         free(*currently_running);
         fill_in_running_with_next_process(init, currently_running, high, norm, low);
         return 1;
