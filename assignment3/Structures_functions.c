@@ -79,6 +79,8 @@ int Kill_Process(int id, PCB* init, PCB** currently_running, List*high, List*nor
     List_first(high);
     List_first(norm);
     List_first(low);
+    List_first(send);
+    List_first(receive);
     PCB* process_from_high_queue = List_search(high, compare, (void*)&id);
     PCB* process_from_norm_queue = List_search(norm, compare, (void*)&id);
     PCB* process_from_low_queue = List_search(low, compare, (void*)&id);
@@ -131,13 +133,13 @@ int Kill_Process(int id, PCB* init, PCB** currently_running, List*high, List*nor
     else if(process_from_send_queue != NULL){
         List_remove(send);
         free(process_from_send_queue);
-        printf("The process with ID %d was Killed\nIt was in the low priority queue\n", id);
+        printf("The process with ID %d was Killed\nIt was in the send queue\n", id);
         return 1;
     }
     else{
         List_remove(receive);
         free(process_from_receive_queue);
-        printf("The process with ID %d was Killed\nIt was in the low priority queue\n", id);
+        printf("The process with ID %d was Killed\nIt was in the receive queue\n", id);
         return 1;
     }
     
@@ -297,6 +299,7 @@ int sendProcess(int pID, char* msg, PCB* initProcess, PCB** runningProcess ,List
     // make sure not using the init process
     if((*runningProcess)->ID != 0)
     {
+        List_first(receiveQueue);
         PCB* process_from_receive_queue = List_search(receiveQueue, compare, (void*)&pID);
         strcpy((*runningProcess)->msg, msg);
 
@@ -326,24 +329,28 @@ int sendProcess(int pID, char* msg, PCB* initProcess, PCB** runningProcess ,List
         else{
             // check all other queue to make sure the process exists
             bool Found_ID = false;
+            List_first(highPriorityQueue);
             PCB* process_from_queue = List_search(highPriorityQueue, compare, (void*)&pID);
 
             if(process_from_queue != NULL){ // check high prio queue
                 Found_ID = true;
             }
             if(!Found_ID){  // check normal prio queue
+                List_first(normPriorityQueue);
                 process_from_queue = List_search(normPriorityQueue, compare, (void*)&pID);
                 if(process_from_queue != NULL){ 
                     Found_ID = true;
                 }
             }
             if(!Found_ID){  // check low prio queue
+                List_first(lowPriorityQueue);
                 process_from_queue = List_search(lowPriorityQueue, compare, (void*)&pID);
                 if(process_from_queue != NULL){
                     Found_ID = true;
                 }
             }
             if(!Found_ID){  // check send queue
+                List_first(sendQueue);
                 process_from_queue = List_search(sendQueue, compare, (void*)&pID);
                 if(process_from_queue != NULL){
                     Found_ID = true;
@@ -352,6 +359,7 @@ int sendProcess(int pID, char* msg, PCB* initProcess, PCB** runningProcess ,List
             for(int i = 0; (i < 5) && (!Found_ID); i++){ // check all semaphore queues
 
                 if(semaphores[i].initialized != 0){
+                    List_first(semaphores[i].blocked_on_this_semaphore);
                     process_from_queue = List_search(semaphores[i].blocked_on_this_semaphore, compare, (void*)&pID);
                     if(process_from_queue != NULL){
                         Found_ID = true;
@@ -511,6 +519,7 @@ int receiveProcess(PCB** runningProcess, List*receiveQueue, List* sendQueue)
     if((*runningProcess)->ID != 0)
     {
         // search the send queue for a process trying to send a message to your ID
+        List_first(sendQueue);
         PCB* process_from_send_queue = List_search(sendQueue, compare_send_ID, (void*)&((*runningProcess)->ID));
 
         if(process_from_send_queue == NULL){

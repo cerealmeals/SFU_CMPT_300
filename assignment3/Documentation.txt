@@ -1,0 +1,8 @@
+Starvation and our solution:
+
+what the Init process can't do and why it can't do it
+
+    send 
+    receive
+    P_semaphore
+    fork
