@@ -4,28 +4,28 @@
 #include <string.h>
 
 
-void Create_Process(int prio,  PCB** currently_running, List* prio_queue, int id){
+void Create_Process(int prio,  PCB** currently_running, List* prio_queue, int* id){
     PCB* process = (PCB*)malloc(sizeof(PCB));
-    printf("withing create, address memory was allocated to: %d\n", process);
-    process->ID = id;
+    
+    process->ID = *id;
     process->priority = prio;
     process->state = READY;
     process->sending_ID = 0;
-    id++;
+    (*id)++;
 
     if(((*currently_running)->ID) == 0){
         process->state = RUNNING;
         *currently_running = process;
-        printf("Process with ID: %d replaced the init process and is now running\n", id);
+        printf("Process with ID: %d replaced the init process and is now running\n", process->ID);
         
     }
     else{
         int check = List_append(prio_queue, process);
         if(check == 0){
-            printf("Process with ID: %d was placed on the end the ready queue with priority %d\n", id, prio);
+            printf("Process with ID: %d was placed on the end the ready queue with priority %d\n", process->ID, prio);
         }
         else{
-            printf("Was not space to add the process with ID %d to the queue, remove other process before continuing", id);
+            printf("Was not space to add the process with ID %d to the queue, remove other process before continuing", process->ID);
             free(process);
         }
     }
@@ -35,7 +35,7 @@ void Create_Process(int prio,  PCB** currently_running, List* prio_queue, int id
 // Q corresponding to the original process' priority.
 // Attempting to Fork the "init" process (see below) should fail.
 // Return pID on success, -1 on failure 
-int forkProcess(PCB** runningProcess,List*highPriorityQueue, List*normPriorityQueue,List*lowPriorityQueue, int count)
+int forkProcess(PCB** runningProcess,List*highPriorityQueue, List*normPriorityQueue,List*lowPriorityQueue, int* id)
 {
     // if "init" process, return -1
     if ((*runningProcess)->ID == 0)
@@ -47,12 +47,12 @@ int forkProcess(PCB** runningProcess,List*highPriorityQueue, List*normPriorityQu
     // copy current process
     PCB* copy_process = NULL;
     copy_process = (PCB*)malloc(sizeof(*runningProcess));
-    copy_process->ID = count;
+    copy_process->ID = *id;
     copy_process->priority = (*runningProcess)->priority;
     copy_process->state = (*runningProcess)->state;
     copy_process->sending_ID = (*runningProcess)->sending_ID;
     strcpy(copy_process->msg, ((*runningProcess)->msg));
-    count++;
+    (*id)++;
 
     // put it into the ready queue
     if (copy_process->priority == 0)
@@ -204,7 +204,7 @@ void fill_in_running_with_next_process(PCB* init, PCB** currently_running, List*
         the patern would be "high1, high2, norm1, high1, high2, norm2, high1, high2, norm3, high1, high2, low1, high1, high2, norm1"
                                                                                         the patern repeats here /\
     */
-    printf("Within Fill_in_running\n");
+
     // start with assuming you should use high priority
     static bool high_turn = 1, norm_turn = 1, low_turn = 1;
     static int track_high = 0, high_cap = 0, track_norm = 0, norm_cap = 0;
@@ -290,13 +290,15 @@ void fill_in_running_with_next_process(PCB* init, PCB** currently_running, List*
 // report scheduling information,  and reply source and text (once
 // reply arrives)
 // Return 0 on success, -1 on failure, 1 if the init process was the calling process
-int sendProcess(int pID, char* msg, PCB* initProcess, PCB** runningProcess,List* sendQueue, List* receiveQueue, List* highPriorityQueue, List* normPriorityQueue,List* lowPriorityQueue, Semaphore* semaphores)
+int sendProcess(int pID, char* msg, PCB* initProcess, PCB** runningProcess ,List* sendQueue, List* receiveQueue, List* highPriorityQueue, List* normPriorityQueue,List* lowPriorityQueue, Semaphore* semaphores)
 {
     // printf("The id of running process is: %d, the priority is: %d.\n", runningProcess->ID, runningProcess->priority);
 
+    // make sure not using the init process
     if((*runningProcess)->ID != 0)
     {
         PCB* process_from_receive_queue = List_search(receiveQueue, compare, (void*)&pID);
+        strcpy((*runningProcess)->msg, msg);
 
         if(process_from_receive_queue != NULL){
             // found on the receive queue
@@ -304,7 +306,7 @@ int sendProcess(int pID, char* msg, PCB* initProcess, PCB** runningProcess,List*
             // then block yourself waiting for reply
 
             strcpy(process_from_receive_queue->msg, msg);
-
+            List_remove(receiveQueue);
             if(process_from_receive_queue->priority == 0){
                 List_append(highPriorityQueue, process_from_receive_queue);
             }
@@ -314,14 +316,18 @@ int sendProcess(int pID, char* msg, PCB* initProcess, PCB** runningProcess,List*
             else{
                 List_append(lowPriorityQueue, process_from_receive_queue);
             }
-
+            (*runningProcess)->state = BLOCKED;
             List_append(sendQueue, *runningProcess);
+            printf("The message to be sent is: %s \n", process_from_receive_queue->msg);
+            printf("The id of receiver process is: %d, and it was place on the queue with priority: %d.\n", process_from_receive_queue->ID, process_from_receive_queue->priority);
+
             return 0;
         }
         else{
             // check all other queue to make sure the process exists
             bool Found_ID = false;
             PCB* process_from_queue = List_search(highPriorityQueue, compare, (void*)&pID);
+
             if(process_from_queue != NULL){ // check high prio queue
                 Found_ID = true;
             }
@@ -356,7 +362,11 @@ int sendProcess(int pID, char* msg, PCB* initProcess, PCB** runningProcess,List*
             // Did you find the process?
             if(Found_ID){
                 // block yourself and wait for the process your sending to, to call receive
+                (*runningProcess)->state = BLOCKED;
+                (*runningProcess)->sending_ID = pID;
                 List_append(sendQueue, *runningProcess);
+                printf("The message to be sent is: %s \n", msg);
+                printf("The process wasn't on the receiving queue so the running process was blocked\n");
                 return 0;
             }
             else{
@@ -497,6 +507,7 @@ int sendProcess(int pID, char* msg, PCB* initProcess, PCB** runningProcess,List*
 // message text and source of message
 int receiveProcess(PCB** runningProcess, List*receiveQueue, List* sendQueue)
 {   
+
     if((*runningProcess)->ID != 0)
     {
         // search the send queue for a process trying to send a message to your ID
@@ -506,6 +517,7 @@ int receiveProcess(PCB** runningProcess, List*receiveQueue, List* sendQueue)
             // did not find a process that has already sent
             // block your self so you can wait until one sends to you
             printf("Did not find a process on the send queue for sending to the ID %d\nBlocking currently running process until it gets sent a message\n", ((*runningProcess)->ID));
+            (*runningProcess)->state = BLOCKED;
             List_append(receiveQueue, *runningProcess);
             return -1;
         }
@@ -812,13 +824,14 @@ int procInfo(int pID, PCB* initProcess, PCB** runningProcess,List*highPriorityQu
     // check the semaphore queues
     for(int i = 0; (i < 5) && (!doYouFoundID); i++){ // check all semaphore queues
 
-                if(semaphores[i].initialized != 0){
-                    currentProcess = List_search(semaphores[i].blocked_on_this_semaphore, compare, (void*)&pID);
-                    if(currentProcess != NULL){
-                        doYouFoundID = true;
-                    }
-                }  
+        if(semaphores[i].initialized != 0){
+            List_first(semaphores[i].blocked_on_this_semaphore);
+            processToBeFound = List_search(semaphores[i].blocked_on_this_semaphore, compare, (void*)&pID);
+            if(processToBeFound != NULL){
+                doYouFoundID = true;
             }
+        }  
+    }
 
 
     // if found, print all info
@@ -895,12 +908,14 @@ void totalInfo(PCB* initProcess, PCB** runningProcess,List*highPriorityQueue, Li
     if (List_count(sendQueue)!=0)
     {
         currentProcess = List_first(sendQueue);
-        printf("***In the send priority queue***\n");
+        printf("***In the send queue***\n");
         while (currentProcess != NULL)
         {
             printf("The id of the found process is: %d, the priority is: %d\n", currentProcess->ID, currentProcess->priority);
             printf("The state of the found process is: %d\n", currentProcess->state);
+            printf("The sending_ID of the found process is: %d\n", currentProcess->sending_ID);
             printf("The message of the found process is: %s\n", currentProcess->msg);
+            
 
             currentProcess = List_next(sendQueue);
         }
@@ -909,7 +924,7 @@ void totalInfo(PCB* initProcess, PCB** runningProcess,List*highPriorityQueue, Li
     if (List_count(receiveQueue)!=0)
     {
         currentProcess = List_first(receiveQueue);
-        printf("***In the receive priority queue***\n");
+        printf("***In the receive queue***\n");
         while (currentProcess != NULL)
         {
             printf("The id of the found process is: %d, the priority is: %d\n", currentProcess->ID, currentProcess->priority);
@@ -919,5 +934,21 @@ void totalInfo(PCB* initProcess, PCB** runningProcess,List*highPriorityQueue, Li
             currentProcess = List_next(receiveQueue);
         }
 
+    }
+
+    for(int i = 0; (i < 5); i++){ // check all semaphore queues
+
+        if(semaphores[i].initialized != 0){
+            currentProcess = List_first(semaphores[i].blocked_on_this_semaphore);
+            printf("***In semaphore %d queue***\n", i);
+            while (currentProcess != NULL)
+            {
+                printf("The id of the found process is: %d, the priority is: %d\n", currentProcess->ID, currentProcess->priority);
+                printf("The state of the found process is: %d\n", currentProcess->state);
+                printf("The message of the found process is: %s\n", currentProcess->msg);
+
+                currentProcess = List_next(semaphores[i].blocked_on_this_semaphore);
+            }
+        }  
     }
 }

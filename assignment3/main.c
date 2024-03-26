@@ -9,7 +9,7 @@ PCB init;
 init.ID = 0;
 init.priority = 2;
 init.state = RUNNING;
-int how_many_process = 1;
+int for_different_process_id = 1;
 
 // initialization stuff...
 // like the 5 list that make the queues...
@@ -33,9 +33,9 @@ running_PCB = &init;
 int stop = 1;
 while(stop) // not infinite but for now...
     {
-    printf("\nwaiting for next command\n");
-    printf("Main, running ID:%d\n", (running_PCB->ID));
-    printf("Main, address of running PCB:%d\n", running_PCB);
+    printf("\nMain, running ID:%d\n", (running_PCB->ID));
+    printf("waiting for next command\n");
+    
     // get user input
     char c[2]; // first letter of the scanf
 
@@ -55,13 +55,13 @@ while(stop) // not infinite but for now...
             printf("did it get into Create?\n");
             scanf("%d", &Priority);
             if(Priority == 0){
-                Create_Process(Priority, &running_PCB, highPriorityQueue, how_many_process);
+                Create_Process(Priority, &running_PCB, highPriorityQueue, &for_different_process_id);
             }
             else if(Priority == 1){
-                Create_Process(Priority, &running_PCB, normPriorityQueue, how_many_process);
+                Create_Process(Priority, &running_PCB, normPriorityQueue, &for_different_process_id);
             }
             else if(Priority == 2){
-                Create_Process(Priority, &running_PCB, lowPriorityQueue, how_many_process);
+                Create_Process(Priority, &running_PCB, lowPriorityQueue, &for_different_process_id);
             }
             else{
                 printf("The Priority can only be 0,1,2\n");
@@ -70,7 +70,7 @@ while(stop) // not infinite but for now...
 
         case 'F' :  // Kaite
             printf("***did it get into Fork?***\n");
-            check = forkProcess(&running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue, how_many_process);
+            check = forkProcess(&running_PCB, highPriorityQueue, normPriorityQueue, lowPriorityQueue, &for_different_process_id);
             if (check == -1)
             {
                 printf("**Fail to fork the process.**\n");

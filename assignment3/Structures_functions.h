@@ -21,7 +21,7 @@ struct Semaphore_s{
 
 
 // Sam's functions
-void Create_Process(int prio, PCB** currently_running, List*queue, int count);
+void Create_Process(int prio, PCB** currently_running, List*queue, int* count);
 
 int Kill_Process(int id, PCB* init, PCB** currently_running, List*high, List*norm, List*low, List*send, List*receive, Semaphore* semaphores);
 
@@ -42,7 +42,7 @@ void P_sem(Semaphore* semaphores, int sem_id, PCB* init, PCB** currently_running
 void V_sem(Semaphore* semaphores, int sem_id, PCB** currently_running, List*high, List*norm, List*low);
 
 //Katie's functions
-int forkProcess(PCB** runningProcess,List*highPriorityQueue, List*normPriorityQueue,List*lowPriorityQueue, int count);
+int forkProcess(PCB** runningProcess,List*highPriorityQueue, List*normPriorityQueue,List*lowPriorityQueue, int* count);
 
 int sendProcess(int pID, char* msg, PCB* initProcess,PCB** runningProcess,List* sendQueue, List* receiveQueue, List* highPriorityQueue, List* normPriorityQueue,List* lowPriorityQueue, Semaphore* semaphores);
 
