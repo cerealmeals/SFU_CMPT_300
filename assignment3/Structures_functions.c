@@ -854,6 +854,12 @@ void totalInfo(PCB* initProcess, PCB** runningProcess,List*highPriorityQueue, Li
 {
     PCB* currentProcess;
     
+    // print initial process
+    printf("***priting initial process***\n");
+    printf("The id of the initial process is: %d, the priority is: %d\n", (*initProcess).ID, (*initProcess).priority);
+    printf("The state of the initial process is: %d\n", (*initProcess).state);
+    printf("The message of the initial process is: %s\n", (*initProcess).msg);
+
     // print running process
     printf("***priting running process***\n");
     printf("The id of the found process is: %d, the priority is: %d\n", (*runningProcess)->ID, (*runningProcess)->priority);
