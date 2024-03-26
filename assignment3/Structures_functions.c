@@ -386,127 +386,6 @@ int sendProcess(int pID, char* msg, PCB* initProcess, PCB** runningProcess ,List
         return 1;
     }
 
-
-    // // send a message
-    // PCB* processToBeSent;
-    // PCB* currentProcess = List_first(highPriorityQueue);
-    // bool doYouFoundID = false;
-    
-    // // search in high queue
-    // while (currentProcess != NULL)
-    // {
-    //     if (currentProcess->ID != pID)
-    //     {
-    //         currentProcess = List_next(highPriorityQueue);
-    //     }
-    //     else
-    //     {
-    //         processToBeSent = currentProcess;
-    //         currentProcess = NULL;
-    //         doYouFoundID = true;
-    //         printf("found in high queue\n");
-    //     }
-    // }
-
-    // // if not found, search in normal queue
-    // if (!doYouFoundID)
-    // {
-    //     currentProcess = List_first(normPriorityQueue);
-    //      while (currentProcess != NULL)
-    //     {
-    //         if (currentProcess->ID != pID)
-    //         {
-    //             currentProcess = List_next(normPriorityQueue);
-    //         }
-    //         else
-    //         {
-    //             processToBeSent = currentProcess;
-    //             currentProcess = NULL;
-    //             doYouFoundID = true;
-    //             printf("found in norm queue\n");
-    //         }
-    //     }
-    // }
-
-    // // if not found, search in low queue
-    // if (!doYouFoundID)
-    // {
-    //     currentProcess = List_first(lowPriorityQueue);
-    //      while (currentProcess != NULL)
-    //     {
-    //         if (currentProcess->ID != pID)
-    //         {fill_in_running_with_next_process(&init, &running_PCB, highPriorityQueue, normPriorityQueue,lowPriorityQueue);
-    // }
-
-    // // if not found, search in receive queue
-    // if (!doYouFoundID)
-    // {
-    //     currentProcess = List_first(receiveQueue);
-    //      while (currentProcess != NULL)
-    //     {
-    //         if (currentProcess->ID != pID)
-    //         {
-    //             currentProcess = List_next(receiveQueue);
-    //         }
-    //         else
-    //         {
-    //             processToBeSent = currentProcess;
-    //             processToBeSent->state = READY;
-
-    //             // Remove it from the receive block queue
-    //             List_remove(receiveQueue);
-
-    //             // put it into the ready queue
-    //             if (processToBeSent->priority == 0)
-    //             {
-    //                 List_append(highPriorityQueue, (void*)processToBeSent);
-    //             }
-    //             else if (processToBeSent->priority == 1)
-    //             {
-    //                 List_append(normPriorityQueue, (void*)processToBeSent);
-    //             }
-    //             else if(processToBeSent->priority == 2)
-    //             {
-    //                 List_append(lowPriorityQueue, (void*)processToBeSent);
-    //             }
-
-    //             currentProcess = NULL;
-    //             doYouFoundID = true;
-    //             printf("found in receive queue\n");
-    //         }
-    //     }
-    // }
-
-
-    // // send the message
-    // if (doYouFoundID)
-    // {
-    //     strcpy(processToBeSent->msg, msg);
-    //     printf("The message to be sent is: %s \n", processToBeSent->msg);
-    //     printf("The id of receiver process is: %d, the priority is: %d.\n", processToBeSent->ID, processToBeSent->priority);
-
-    //     // block myself
-    //     PCB* copy_process = NULL;
-    //     copy_process = (PCB*)malloc(sizeof(runningProcess));
-    //     copy_process->ID = runningProcess->ID;
-    //     copy_process->priority = runningProcess->priority;
-    //     copy_process->state = BLOCKED;
-    //     strcpy(copy_process->msg, runningProcess->msg);
-
-    //     // put it into the send blocked queue       
-    //     List_append(sendQueue, (void*)copy_process);
-
-    //     // // decide next running process
-    //     // runningProcess = nextRunningProcess(initProcess, runningProcess, highPriorityQueue, normPriorityQueue,lowPriorityQueue);
-    //     fill_in_running_with_next_process(initProcess, runningProcess, highPriorityQueue, normPriorityQueue,lowPriorityQueue);
-
-    //     // // print scheduling infomation
-    //     printf("The id of running process now is: %d, the priority is: %d.\n", runningProcess->ID, runningProcess->priority);
-    
-    //     return 0;
-    // }
-
-    // return -1;
 }
 
 
@@ -543,28 +422,6 @@ int receiveProcess(PCB** runningProcess, List*receiveQueue, List* sendQueue)
         printf("The running process is the init process it cannot receive since it can not be blocked");
         return 0;
     }
-
-
-
-
-    // // if no message received, block
-    // if (strlen(runningProcess->msg) == 0)
-    // {
-    //     printf("Blocked, no message received\n");
-    //     if (initProcess->state != 0) // can't block initial process
-    //     {
-    //         runningProcess->state = BLOCKED;
-    //         List_append(receiveQueue, runningProcess);
-    //     }
-    //     return -1;
-    // }
-    // else
-    // {
-    //     printf("The id of running process now is: %d, the priority is: %d.\n", runningProcess->ID, runningProcess->priority);
-    //     printf("The message received is: %s\n", runningProcess->msg);
-    //     return 0;
-    // }
-
 }
 
 bool compare_send_ID(void* arg1, void* arg2){
@@ -586,7 +443,7 @@ int replyProcess(int pID, char* msg, List* sendQueue ,List*highPriorityQueue, Li
     // find sender
     PCB* sender_process;
     PCB* current = List_first(sendQueue);
-    //printf("372\n");
+    
     bool ifFound = false;
 
     while (current != NULL)
@@ -599,19 +456,19 @@ int replyProcess(int pID, char* msg, List* sendQueue ,List*highPriorityQueue, Li
         {
             // unblock it
             sender_process = current;
-            //printf("85\n");
+            
             List_remove(sendQueue);
-            //printf("87\n");
+            
             current = NULL;
             ifFound = true;
-            //printf("88\n");
+            
         }
     }
 
     if (ifFound)
     {
         // put it in the ready queue
-        //printf("97\n");
+        
         sender_process->state = READY;
         if (sender_process->priority == 0)
         {
@@ -721,6 +578,7 @@ int procInfo(int pID, PCB* initProcess, PCB** runningProcess,List*highPriorityQu
 
     if (pID == 0 )
     {
+        printf("***priting initial process***\n");
         processToBeFound = initProcess;
         doYouFoundID = true;
     }
@@ -736,6 +594,7 @@ int procInfo(int pID, PCB* initProcess, PCB** runningProcess,List*highPriorityQu
         }
         else
         {
+            printf("***priting from high queue***\n");
             processToBeFound = currentProcess;
             currentProcess = NULL;
             doYouFoundID = true;
@@ -754,7 +613,8 @@ int procInfo(int pID, PCB* initProcess, PCB** runningProcess,List*highPriorityQu
                 currentProcess = List_next(normPriorityQueue);
             }
             else
-            {
+            {   
+                printf("***priting from normal queue***\n");
                 processToBeFound = currentProcess;
                 currentProcess = NULL;
                 doYouFoundID = true;
@@ -773,7 +633,8 @@ int procInfo(int pID, PCB* initProcess, PCB** runningProcess,List*highPriorityQu
                 currentProcess = List_next(lowPriorityQueue);
             }
             else
-            {
+            {   
+                printf("***priting from low queue***\n");
                 processToBeFound = currentProcess;
                 currentProcess = NULL;
                 doYouFoundID = true;
@@ -792,7 +653,8 @@ int procInfo(int pID, PCB* initProcess, PCB** runningProcess,List*highPriorityQu
                 currentProcess = List_next(receiveQueue);
             }
             else
-            {
+            {   
+                printf("***priting from receive queue***\n");
                 processToBeFound = currentProcess;
                 currentProcess = NULL;
                 doYouFoundID = true;
@@ -812,7 +674,8 @@ int procInfo(int pID, PCB* initProcess, PCB** runningProcess,List*highPriorityQu
                 currentProcess = List_next(sendQueue);
             }
             else
-            {
+            {   
+                printf("***priting from send queue***\n");
                 processToBeFound = currentProcess;
                 currentProcess = NULL;
                 doYouFoundID = true;
@@ -824,6 +687,7 @@ int procInfo(int pID, PCB* initProcess, PCB** runningProcess,List*highPriorityQu
     // check the running process
     if (!doYouFoundID){
         if((*runningProcess)->ID == pID){
+            printf("***priting from running process***\n");
             processToBeFound = *runningProcess;
             doYouFoundID = true;
         }
@@ -837,6 +701,7 @@ int procInfo(int pID, PCB* initProcess, PCB** runningProcess,List*highPriorityQu
             List_first(semaphores[i].blocked_on_this_semaphore);
             processToBeFound = List_search(semaphores[i].blocked_on_this_semaphore, compare, (void*)&pID);
             if(processToBeFound != NULL){
+                printf("***priting from semaphore %d queue***\n", i);
                 doYouFoundID = true;
             }
         }  
