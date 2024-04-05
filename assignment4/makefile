@@ -3,8 +3,8 @@ CC = gcc
 CFLAGS = -Wall -g -I/300/ass1
 LDFLAGS = 
 PROG = UnixLs
-HDRS = 
-SRCS = main.c 
+HDRS = functions.h
+SRCS = main.c functions.c
 ## This incantation says that the object files
 ## have the same name as the .c files, but with .o
 OBJS = $(SRCS:.c=.o)
@@ -15,7 +15,8 @@ $(PROG) : $(OBJS)
 ## Rules for the source files -- these do not have
 ## second build rule lines, so they will use the
 ## default build rule to compile X.c to make X.o
-main.o : main.c
+main.o : main.c functions.h
+functions.o : functions.h
 ## Remove all the compilation and debugging files
 clean :
 	rm -f core $(PROG) $(OBJS)
