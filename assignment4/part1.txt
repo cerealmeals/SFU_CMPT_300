@@ -1,6 +1,6 @@
 CMPT 300 Assignment 4 Part 1
 
-Sam [Sam's last name] [student #]
+Samuel Nygard 301605696
 Kangyi Zhang 301542066
 
 (1)
