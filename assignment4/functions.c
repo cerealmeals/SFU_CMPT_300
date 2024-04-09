@@ -243,9 +243,11 @@ void output_l(struct stat* info){
 
 // column 6
     struct tm* time = localtime(&(info->st_mtim.tv_sec));
-    char buffer[80];
-    strftime(buffer, 80, "%b %d %Y %H:%M", time);
-    printf(" %s", buffer);
+    char month[10];
+    char year_and_time[15];
+    strftime(month, 10, "%b", time);
+    strftime(year_and_time, 15, "%Y %H:%M", time);
+    printf(" %s %2d %s", month, time->tm_mday, year_and_time);
 
 }
 
