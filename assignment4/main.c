@@ -22,7 +22,12 @@ int main(int argc, char *argv[])
 
     printf("argc #: %d\n", argc);
 
-    if (argc == 2)
+
+    if (argc < 2)
+    {
+        ls(path);
+    }
+    else if (argc == 2)
     {
         if (strcmp(argv[1], "ls") == 0){
             ls(path);
