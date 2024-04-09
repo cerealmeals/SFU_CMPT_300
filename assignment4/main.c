@@ -17,12 +17,16 @@ int main(int argc, char *argv[]) {
     char* str2;
 
     char path[PATH_MAX] = "\0";
-    
+    //printf("path_max %d", PATH_MAX);
     char ch = '-';                                                                                                                                              
     char *ret1;
     char *ret2;
     printf("argc #: %d\n", argc);
 
+    if (argc < 3)
+    {
+        printf("command not found\n");
+    }
     if(argc == 3){                                                                                                                                          
         arg1_len = strlen(argv[2]);
         str1 = argv[2];
@@ -111,9 +115,7 @@ int main(int argc, char *argv[]) {
         printf("Not the correct arguments, try 'i' or 'l' line 105\n");
     }
 
-    if (!flag_i && !flag_l)
-        ls(path);
-    else if (flag_i && !flag_l)
+    if (flag_i && !flag_l)
         lsi(path);
     else if (!flag_i && flag_l)
         lsl(path);
@@ -121,4 +123,4 @@ int main(int argc, char *argv[]) {
         lsil(path);
 
     return 0;
-    }
+}
