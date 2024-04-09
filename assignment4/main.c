@@ -16,6 +16,8 @@ int main(int argc, char *argv[]) {
     char* str1;    
     char* str2;
 
+    char path[PATH_MAX] = "\0";
+    
     char ch = '-';                                                                                                                                              
     char *ret1;
     char *ret2;
@@ -110,13 +112,13 @@ int main(int argc, char *argv[]) {
     }
 
     if (!flag_i && !flag_l)
-        ls();
+        ls(path);
     else if (flag_i && !flag_l)
-        lsi();
+        lsi(path);
     else if (!flag_i && flag_l)
-        lsl();
+        lsl(path);
     else if (flag_i && flag_l)
-        lsil();
+        lsil(path);
 
     return 0;
     }

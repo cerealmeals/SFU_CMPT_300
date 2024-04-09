@@ -10,11 +10,14 @@
 #include <grp.h>
 #include <time.h>
 
-void ls(){
-    char cwd[PATH_MAX];
-    if (getcwd(cwd, sizeof(cwd)) == NULL) {
-        perror("getcwd() error");
-        return;
+void ls(char* path){
+
+    char* cwd = path;
+    if(cwd[0] == '\0'){
+        if (getcwd(cwd, PATH_MAX) == NULL) {
+            perror("getcwd() error");
+            return;
+        }
     }
 
     DIR* directory_stream = opendir(cwd);
@@ -33,12 +36,14 @@ void ls(){
     return;
 }
 
-void lsi(){
+void lsi(char* path){
 
-    char cwd[PATH_MAX];
-    if (getcwd(cwd, sizeof(cwd)) == NULL) {
-        perror("getcwd() error");
-        return;
+    char* cwd = path;
+    if(cwd[0] == '\0'){
+        if (getcwd(cwd, PATH_MAX) == NULL) {
+            perror("getcwd() error");
+            return;
+        }
     }
 
     DIR* directory_stream = opendir(cwd);
@@ -58,12 +63,14 @@ void lsi(){
 
 }
 
-void lsl(){
+void lsl(char* path){
 
-    char cwd[PATH_MAX];
-    if (getcwd(cwd, sizeof(cwd)) == NULL) {
-        perror("getcwd() error");
-        return;
+    char* cwd = path;
+    if(cwd[0] == '\0'){
+        if (getcwd(cwd, PATH_MAX) == NULL) {
+            perror("getcwd() error");
+            return;
+        }
     }
 
     DIR* directory_stream = opendir(cwd);
@@ -79,14 +86,29 @@ void lsl(){
         strcpy(path_of_file, cwd);
         strcat(path_of_file, readable->d_name);
         
-        int result = stat(readable->d_name, &info);
+        int result = lstat(readable->d_name, &info);
         
         if(readable->d_name[0] != '.'){
             if(result == 0){
                 
                 output_l(&info);
                 
-                printf(" %s\n", readable->d_name);
+                printf(" %s", readable->d_name);
+
+                if(S_ISLNK(info.st_mode)){
+                    char buf[PATH_MAX];
+                    int check = readlink(readable->d_name, buf, PATH_MAX);
+                    if(check != -1){
+                        buf[check] = '\0';
+                    }
+                    else{
+                        printf("Error readlink-lsl\n");
+                    }
+                    printf(" -> %s\n", buf);
+                }
+                else{
+                    printf("\n");
+                }
                 
             }
             else{
@@ -100,12 +122,14 @@ void lsl(){
 
 }
 
-void lsil(){
+void lsil(char* path){
 
-    char cwd[PATH_MAX];
-    if (getcwd(cwd, sizeof(cwd)) == NULL) {
-        perror("getcwd() error");
-        return;
+    char* cwd = path;
+    if(cwd[0] == '\0'){
+        if (getcwd(cwd, PATH_MAX) == NULL) {
+            perror("getcwd() error");
+            return;
+        }
     }
 
     DIR* directory_stream = opendir(cwd);
@@ -121,7 +145,7 @@ void lsil(){
         strcpy(path_of_file, cwd);
         strcat(path_of_file, readable->d_name);
         
-        int result = stat(readable->d_name, &info);
+        int result = lstat(readable->d_name, &info);
         
         if(readable->d_name[0] != '.'){
             if(result == 0){
@@ -130,7 +154,22 @@ void lsil(){
 
                 output_l(&info);
                 
-                printf(" %s\n", readable->d_name);
+                printf(" %s", readable->d_name);
+
+                if(S_ISLNK(info.st_mode)){
+                    char buf[PATH_MAX];
+                    int check = readlink(readable->d_name, buf, PATH_MAX);
+                    if(check != -1){
+                        buf[check] = '\0';
+                    }
+                    else{
+                        printf("Error readlink-lsl\n");
+                    }
+                    printf(" -> %s\n", buf);
+                }
+                else{
+                    printf("\n");
+                }
                 
             }
             else{
@@ -151,6 +190,11 @@ void output_l(struct stat* info){
     if(S_ISDIR(info->st_mode)){
         printf("d");
     }
+    // soft link?
+    else if(S_ISLNK(info->st_mode)){
+        printf("l");
+    }
+    // file?
     else{
         printf("-");
     }
@@ -198,7 +242,7 @@ void output_l(struct stat* info){
     printf(" %5ld", info->st_size);
 
 // column 6
-    struct tm* time = gmtime(&(info->st_mtim.tv_sec));
+    struct tm* time = localtime(&(info->st_mtim.tv_sec));
     char buffer[80];
     strftime(buffer, 80, "%b %d %Y %H:%M", time);
     printf(" %s", buffer);
