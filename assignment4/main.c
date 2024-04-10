@@ -56,7 +56,8 @@ int main(int argc, char *argv[])
                     flag_l = true;
                 }
                 else{
-                    printf("invalid option -%s\nTry -i or -l\n", argv[i]);
+                    printf("invalid option -%s\n", argv[i]);
+                    printf("Try -i or -l\n");
                     return 0;
                 }
             }
