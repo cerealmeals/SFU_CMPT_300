@@ -98,7 +98,7 @@ void lsl(char* path){
         strcpy(path_of_file, cwd);
         strcat(path_of_file, readable->d_name);
         
-        int result = lstat(readable->d_name, &info);
+        int result = lstat(path_of_file, &info);
         
         if(readable->d_name[0] != '.'){
             if(result == 0){
@@ -161,7 +161,7 @@ void lsil(char* path){
         strcpy(path_of_file, cwd);
         strcat(path_of_file, readable->d_name);
         
-        int result = lstat(readable->d_name, &info);
+        int result = lstat(path_of_file, &info);
         
         if(readable->d_name[0] != '.'){
             if(result == 0){
