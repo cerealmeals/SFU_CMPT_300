@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 
     if (argc < 2)
     {
-        ls(path);
+        ls();
     }
     else
     {
@@ -65,16 +65,20 @@ int main(int argc, char *argv[])
             else
             {
                 strcpy(path, argv[i]);
-                if (flag_i) {
+                if (flag_i)
+                {
                     lsi(path);
                 }
-                else if (flag_l) {
+                else if (flag_l)
+                {
                     lsl(path);
                 }
-                else if (flag_i && flag_l) {
+                else if (flag_i && flag_l)
+                {
                     lsil(path);
                 }
-                else {
+                else
+                {
                     ls(path);
                 }
             }
@@ -82,18 +86,18 @@ int main(int argc, char *argv[])
 
         if (path_flag)
         {
-            if (flag_i) {
-                    lsi();
-                }
-                else if (flag_l) {
-                    lsl();
-                }
-                else if (flag_i && flag_l) {
-                    lsil();
-                }
-                else {
-                    ls();
-                }
+            if (flag_i)
+            {
+                lsi();
+            }
+            else if (flag_l)
+            {
+                lsl();
+            }
+            else if (flag_i && flag_l)
+            {
+                lsil();
+            }
         }
     }
 
