@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
             // if not starting with '-' it is a path
             // give path to function
             // set path_flag to flase
-            if (path_flag = false)
+            if (argv[i][0] == '-' && path_flag == false)
             {
                 if (strcmp(argv[i], "-i") == 0)
                 {
@@ -55,48 +55,51 @@ int main(int argc, char *argv[])
                     flag_i = true;
                     flag_l = true;
                 }
-                else
-                {
-                    path_flag = true;
-                    strcpy(path, argv[i]);
-                    ls(path);
-                }
             }
             else
             {
+                path_flag = true;
                 strcpy(path, argv[i]);
-                if (flag_i)
-                {
-                    lsi(path);
+                if (flag_i && flag_l)
+                {   
+                    printf("%s:\n", path);
+                    lsil(path);
+                    printf("\n");
                 }
                 else if (flag_l)
                 {
+                    printf("%s:\n", path);
                     lsl(path);
+                    printf("\n");
                 }
-                else if (flag_i && flag_l)
+                else if (flag_i)
                 {
-                    lsil(path);
+                    printf("%s:\n", path);
+                    lsi(path);
+                    printf("\n");
                 }
                 else
                 {
+                    printf("%s:\n", path);
                     ls(path);
+                    printf("\n");
                 }
             }
         }
 
-        if (path_flag)
+        if (path_flag == false)
         {
-            if (flag_i)
+            if (flag_i && flag_l)
             {
-                lsi();
+                lsil(path);
             }
             else if (flag_l)
             {
-                lsl();
+                lsl(path);
             }
-            else if (flag_i && flag_l)
+            else if (flag_i)
             {
-                lsil();
+                lsi(path);
             }
         }
     }

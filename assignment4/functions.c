@@ -21,6 +21,10 @@ void ls(char* path){
     }
 
     DIR* directory_stream = opendir(cwd);
+    if(directory_stream == NULL){
+        printf("Error: %s is not a valid path\n", cwd);
+        return;
+    }
 
     struct dirent* readable = readdir(directory_stream);
     
@@ -47,6 +51,10 @@ void lsi(char* path){
     }
 
     DIR* directory_stream = opendir(cwd);
+    if(directory_stream == NULL){
+        printf("Error: %s is not a valid path\n", cwd);
+        return;
+    }
     struct dirent* readable = readdir(directory_stream);
 
     
@@ -74,6 +82,10 @@ void lsl(char* path){
     }
 
     DIR* directory_stream = opendir(cwd);
+    if(directory_stream == NULL){
+        printf("Error: %s is not a valid path\n", cwd);
+        return;
+    }
     struct dirent* readable = readdir(directory_stream);
     struct stat info;
     
@@ -133,6 +145,10 @@ void lsil(char* path){
     }
 
     DIR* directory_stream = opendir(cwd);
+    if(directory_stream == NULL){
+        printf("Error: %s is not a valid path\n", cwd);
+        return;
+    }
     struct dirent* readable = readdir(directory_stream);
     struct stat info;
     
