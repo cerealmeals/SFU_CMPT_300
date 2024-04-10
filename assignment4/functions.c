@@ -109,12 +109,12 @@ void lsl(char* path){
 
                 if(S_ISLNK(info.st_mode)){
                     char buf[PATH_MAX];
-                    int check = readlink(readable->d_name, buf, PATH_MAX);
+                    int check = readlink(path_of_file, buf, PATH_MAX);
                     if(check != -1){
                         buf[check] = '\0';
                     }
                     else{
-                        printf("Error readlink-lsl\n");
+                        printf(" Error readlink-lsl errno: %s\n", strerror(errno));
                     }
                     printf(" -> %s\n", buf);
                 }
@@ -174,12 +174,12 @@ void lsil(char* path){
 
                 if(S_ISLNK(info.st_mode)){
                     char buf[PATH_MAX];
-                    int check = readlink(readable->d_name, buf, PATH_MAX);
+                    int check = readlink(path_of_file, buf, PATH_MAX);
                     if(check != -1){
                         buf[check] = '\0';
                     }
                     else{
-                        printf("Error readlink-lsl\n");
+                        printf(" Error readlink-lsl errno: %s\n", strerror(errno));
                     }
                     printf(" -> %s\n", buf);
                 }
