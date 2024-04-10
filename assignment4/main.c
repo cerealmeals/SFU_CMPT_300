@@ -27,30 +27,30 @@ int main(int argc, char *argv[])
     {
         ls(path);
     }
-    else if (argc == 2)
-    {
-        if (strcmp(argv[1], "ls") == 0){
-            ls(path);
-        }
-    }
-    else if(argc == 3 && strcmp(argv[1], "ls") == 0)
+    // else if (argc == 2)
+    // {
+    //     if (strcmp(argv[1], "ls") == 0){
+    //         ls(path);
+    //     }
+    // }
+    else if(argc == 2)
     {                                                                                                                                          
         //arg1_len = strlen(argv[2]);
         //ret1 = strchr(argv[2], ch);
         //printf("String after |%c| is: |%s|\n", ch, ret1);
         //printf("length of arg1: %d\n", arg1_len);
 
-        if (strcmp(argv[2], "-i") == 0)
+        if (strcmp(argv[1], "-i") == 0)
         {
             flag_i = true;
             printf("flag i is true\n");
         }
-        else if (strcmp(argv[2], "-l") == 0)
+        else if (strcmp(argv[1], "-l") == 0)
         {
             flag_l = true;
             printf("flag l is true\n");
         }
-        else if (strcmp(argv[2], "-il") == 0 || strcmp(argv[2], "-li") == 0)
+        else if (strcmp(argv[1], "-il") == 0 || strcmp(argv[1], "-li") == 0)
         {
             flag_i = true;
             flag_l = true;
@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
             printf("Not the correct arguments, try 'i' or 'l'\n");
         }
     }
-    else if(argc == 4 && strcmp(argv[1], "ls") == 0)
+    else if(argc == 3)
     {
         // arg1_len = strlen(argv[2]);
         // arg2_len = strlen(argv[3]);
@@ -72,32 +72,32 @@ int main(int argc, char *argv[])
         // printf("String after |%c| is: |%s|\n", ch, ret1);
         // printf("String after |%c| is: |%s|\n", ch, ret2);
 
-        if ((strcmp(argv[2], "-i")==0 && strcmp(argv[3], "-l")==0) || (strcmp(argv[2], "-l")==0 && strcmp(argv[3], "-i")==0))
+        if ((strcmp(argv[1], "-i")==0 && strcmp(argv[2], "-l")==0) || (strcmp(argv[1], "-l")==0 && strcmp(argv[2], "-i")==0))
         {
             flag_i = true;
             flag_l = true;
             printf("flag i and l is true\n");
         }
-        else if (strcmp(argv[2], "-i")==0 && strcmp(argv[3], "-l")!=0)
+        else if (strcmp(argv[1], "-i")==0 && strcmp(argv[2], "-l")!=0)
         {
             // case: ./UnixLS ls -i path 
             flag_i = true;
-            strcpy(path, argv[3]);
+            strcpy(path, argv[2]);
             printf("flag i is true, getting path: %s\n", path);
         }
-        else if (strcmp(argv[2], "-l")==0 && strcmp(argv[3], "-i")!=0)
+        else if (strcmp(argv[1], "-l")==0 && strcmp(argv[2], "-i")!=0)
         {
             // case: ./UnixLS ls -l path
             flag_l = true;
-            strcpy(path, argv[3]);
+            strcpy(path, argv[2]);
             printf("flag l is true, getting path: %s\n", path);
         } 
-        else if (strcmp(argv[2], "-il")==0 || strcmp(argv[2], "-li")==0)
+        else if (strcmp(argv[1], "-il")==0 || strcmp(argv[1], "-li")==0)
         {
             // case: ./UnixLS ls -il path or ./UnixLS ls -li path
             flag_i = true;
             flag_l = true;
-            strcpy(path, argv[3]);
+            strcpy(path, argv[2]);
             printf("flag i and l is true, getting path: %s\n", path);
         }
         else
@@ -105,20 +105,20 @@ int main(int argc, char *argv[])
             printf("Not the correct arguments, try 'i' or 'l' line 87\n");
         }
     }
-    else if(argc == 5 && strcmp(argv[1], "ls") == 0)
+    else if(argc == 4)
     {
-        if (strcmp(argv[2], "-i") == 0 && strcmp(argv[3], "-l") == 0)
+        if (strcmp(argv[1], "-i") == 0 && strcmp(argv[2], "-l") == 0)
         {
             flag_i = true;
             flag_l = true;
-            strcpy(path, argv[4]);
+            strcpy(path, argv[3]);
             printf("flag i and l is true, getting path: %s\n", path);
         }
-        else if (strcmp(argv[2], "-l") == 0 && strcmp(argv[3], "-i") == 0)
+        else if (strcmp(argv[1], "-l") == 0 && strcmp(argv[2], "-i") == 0)
         {
             flag_i = true;
             flag_l = true;
-            strcpy(path, argv[4]);
+            strcpy(path, argv[3]);
             printf("flag i and l is true, getting path: %s\n", path);
         }
     }
@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
     if (flag_i && !flag_l)
     {
         printf("lsi(path\n");
-        lsi(path);
+        //lsi(path);
     }
     else if (!flag_i && flag_l)
         lsl(path);
