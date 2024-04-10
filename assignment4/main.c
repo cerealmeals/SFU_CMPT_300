@@ -106,5 +106,8 @@ int main(int argc, char *argv[])
                 lsi(path);
             }
         }
+        else{
+            printf("\b\b ");
+        }
     }
 }
