@@ -129,8 +129,8 @@ int main(int argc, char *argv[])
 
     if (flag_i && !flag_l)
     {
-        printf("lsi(path\n");
-        //lsi(path);
+        printf("lsi()\n");
+        lsi(path);
     }
     else if (!flag_i && flag_l)
         lsl(path);

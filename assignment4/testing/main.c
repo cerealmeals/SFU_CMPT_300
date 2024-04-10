@@ -4,38 +4,28 @@ int main(int argc, char *argv[]){
 
     bool flag_i = false;
     bool flag_l = false;
-    int arg1_len = 0;
-    int arg2_len = 0;
+    
+    for(int i = 1; i < argc; i++){
 
-    if(argc >= 1){
-        arg1_len = strlen(argv[1])
-        if(argv[1][1] == 'i' && argv[1][1] == 'l'){
-            if(argv[1][1] == 'i'){
-                flag_i = true;
-            }
-            if(argv[1][1] == 'l'){
-                flag_l = true;
-            }
-            
-        }
-        else{
-            printf("Not the correct arguments, try 'i' or 'l'\n")
-        }
+        // take the first argument
+
+        // parse element
+            // check to see if it has '-' in front
+            // check letters
+                // if i or l set bool's to true
+                // if anything else return error
+        
+            // if not starting with '-' it is a path
+                // give path to function
+                // set path_flag to flase
+
+        
+
+
     }
-    if(argc >= 2){
-        arg2_len = strlen(argv[2])
-        if(argv[2][1] == 'i' && argv[2][1] == 'l'){
-            if(argv[1][1] == 'i'){
-                flag_i = true;
-            }
-            if(argv[1][1] == 'l'){
-                flag_l = true;
-            }
-        }
-        else{
-            printf("Not the correct arguments, try 'i' or 'l'\n")
-        }
-    }
+
+    // if path_flag is true
+        // run the function with no path
 
     
 
